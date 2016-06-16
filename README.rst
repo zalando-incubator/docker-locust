@@ -2,8 +2,7 @@
 Locust.io Docker Image
 ======================
 
-This Docker image allows running the `Locust.io load testing tool`_
-
+This Docker image allows you to run the `Locust.io load testing tool`_. It's different from other Locust-related Docker images in that it loads the actual test execution script (locustfile.py) from AWS S3. I.e., you can use the same Docker image for different load-testing scenarios without providing the locustfile.py "locally" on the server (or in the Docker image itself).
 
 Starting a Locust Master
 ========================
@@ -19,7 +18,7 @@ Starting a Locust Slave
 =======================
 
 Set the ``LOCUST_MASTER_HOST`` environment variable to the master's address (IP) to
-start slave processes.
+start slave processes:
 
 .. code-block::
 
@@ -30,9 +29,9 @@ Configuration Options
 =====================
 
 ``LOCUST_FILE``
-    Filename of Locust test. The filename can reference a file on a S3 bucket, example: ``s3://my-bucket/my-folder/locustfile.py``.
+    Filename of Locust test. The filename can reference a file on a S3 bucket. For example: ``s3://my-bucket/my-folder/locustfile.py``.
 ``LOCUST_TARGET_HOST``
-    Host to load test, example: ``http://example.org``
+    Host to load test. Example: ``http://example.org``
 ``LOCUST_MASTER``
     Run as Locust master
 ``LOCUST_MASTER_HOST``
