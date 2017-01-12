@@ -1,11 +1,13 @@
-import os
+import csv
 import datetime
 import logging
-import csv
+import os
+
+from flask import make_response
+
+from jinja2 import Environment, FileSystemLoader
 
 import requests
-from flask import make_response
-from jinja2 import Environment, FileSystemLoader
 
 
 WORK_DIR = os.path.dirname(__file__)
