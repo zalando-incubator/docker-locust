@@ -51,6 +51,7 @@ class TestEnvironmentVariable(TestCase):
         os.environ['AUTOMATIC'] = str(True)
         os.environ['MASTER_HOST'] = '127.0.0.1'
         os.environ['SLAVE_MUL'] = '3'
+        os.environ['USERS'] = '100'
         os.environ['HATCH_RATE'] = '5'
         os.environ['DURATION'] = '10'
 
@@ -85,7 +86,7 @@ class TestEnvironmentVariable(TestCase):
         os.environ['ROLE'] = 'controller'
         os.environ['AUTOMATIC'] = str(True)
         os.environ['MASTER_HOST'] = '127.0.0.1'
-        os.environ['SLAVE_MUL'] = 'test'
+        os.environ['USERS'] = 'test'
 
         bootstrap()
         self.assertRaises(ValueError)

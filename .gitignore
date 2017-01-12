@@ -1,2 +1,12 @@
+.idea/*
 *.pyc
-locustfile.py
+flake8.log
+
+# Coverage
+.coverage
+coverage.xml
+xunit.xml
+coverage/*
+
+# Reports
+reports/*
