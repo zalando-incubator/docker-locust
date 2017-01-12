@@ -1,81 +1,152 @@
 <!DOCTYPE HTML>
 <html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<style type="text/css">
-    table, th, td { border: 1px solid black; border-collapse: collapse }
-    th {background-color: #add8e6; color: black;}
-</style>
-</head>
-<title>Load Test Report</title>
-<body>
-<h1>Load Test Report</h1>
-<p>Load Test report generated on {{ date }} and find the results,
-observations of the test below</p>
-<h2>Results</h2>
- <p>Users:  <strong>{{ users }}</strong>     Slaves:<strong>{{ slaves }}</strong>
-RPS:<strong>{{ rps }}</strong>     Failures: <strong>{{ fails }}</strong>
-</p>
-<h2>Statistics</h2>
-<table>
-<tr>
-<th><p>Type</p></th>
-<th><p>Name</p></th>
-<th><p># requests</p></th>
-<th><p># fails</p></th>
-<th><p>Median</p></th>
-<th><p>Average</p></th>
-<th><p>Min</p></th>
-<th><p>Max</p></th>
-<th><p>Content Size</p></th>
-<th><p># requests/sec</p></th>
-</tr>
-<tr>
-<td><p>{{method}}</p></td>
-<td><p>{{name}}</p></td>
-<td><p>{{num_requests}}</p></td>
-<td><p>{{num_failures}}</p></td>
-<td><p>{{median_response_time}}</p></td>
-<td><p>{{avg_response_time}}</p></td>
-<td><p>{{min_response_time}}</p></td>
-<td><p>{{min_response_time}}</p></td>
-<td><p>{{max_response_time}}</p></td>
-<td><p>{{avg_content_length}}</p></td>
-</tr>
-<tr>
-<td></td>
-<td><p>Total</p></td>
-<td><p>{{current_rps}}</p></td>
-<td><p>{{current_rps}}</p></td>
-<td><p>{{current_rps}}</p></td>
-<td><p>{{current_rps}}</p></td>
-<td><p>{{current_rps}}</p></td>
-<td><p>{{current_rps}}</p></td>
-<td><p>{{current_rps}}</p></td>
-<td><p>{{current_rps}}</p></td>
-</tr>
-</table>
-<h2>Failures</h2>
-<table>
-<tr>
-  <th>Type</th>
-  <th>Name</th>
-  <th>Occurrences</th>
-  <th>Error</th>
-</tr>
-<tr>
-  <td>{% for method in error_method %}<p>{{method}}</p>{% endfor %}</td>
-  <td>{% for name in error_name %}<p>{{name}}</p>{% endfor %}</td>
-  <td>{% for occur in error_occur %}<p>{{occur}}</p>{% endfor %}</td>
-  <td>{% for type in error_type %}<p>{{type}}</p>{% endfor %}</td>
-</tr>
-</table>
-<h2>Distribution</h2>
-<table>
-<tr><th>{{table_columns}}</th></tr>
-{% for row in table_row %}
-<tr><td><p>{{row}}</p></td></tr>
-{% endfor %}
-</table>
-</body>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <style type="text/css">
+      table, th, td { border: 1px solid black; border-collapse: collapse }
+      th {background-color: #add8e6; color: black;}
+    </style>
+  </head>
+  <title>Load Test Report</title>
+  <body>
+    <h1>Load Test Report</h1>
+    <p>Load Test report generated at {{ datetime }} and find the results,
+      observations of the test below
+    </p>
+    <h2>Results</h2>
+    Slaves:<strong>{{ slaves }}</strong>
+    RPS:<strong>{{ rps }}</strong> Failures: <strong>{{ fails }}</strong>
+    </p>
+    <h2>Statistics</h2>
+    <table>
+      <tr>
+        <th>
+          <p>Type</p>
+        </th>
+        <th>
+          <p>Name</p>
+        </th>
+        <th>
+          <p>Number of Requests</p>
+        </th>
+        <th>
+          <p>Number of Failures</p>
+        </th>
+        <th>
+          <p>Median response time</p>
+        </th>
+        <th>
+          <p>Average response time</p>
+        </th>
+        <th>
+          <p>Min response time</p>
+        </th>
+        <th>
+          <p>Max response time</p>
+        </th>
+        <th>
+          <p>AVG content length</p>
+        </th>
+        <th>
+          <p>Current RPS</p>
+        </th>
+      </tr>
+      <tr>
+        <td>
+          {% for method in stat_methods %}
+          <p>{{method}}</p>
+          {% endfor %}
+        </td>
+        <td>
+          {% for name in stat_names %}
+          <p>{{name}}</p>
+          {% endfor %}
+        </td>
+        <td>
+          {% for req in stat_num_requests %}
+          <p>{{req}}</p>
+          {% endfor %}
+        </td>
+        <td>
+          {% for failure in stat_num_failures %}
+          <p>{{failure}}</p>
+          {% endfor %}
+        </td>
+        <td>
+          {% for median in stat_median_res %}
+          <p>{{median}}</p>
+          {% endfor %}
+        </td>
+        <td>
+          {% for avg in stat_avg_res %}
+          <p>{{avg}}</p>
+          {% endfor %}
+        </td>
+        <td>
+          {% for min in stat_min_res %}
+          <p>{{min}}</p>
+          {% endfor %}
+        </td>
+        <td>
+          {% for max in stat_max_res %}
+          <p>{{max}}</p>
+          {% endfor %}
+        </td>
+        <td>
+          {% for size in stat_content_length %}
+          <p>{{size}}</p>
+          {% endfor %}
+        </td>
+        <td>
+          {% for rs in stat_rps %}
+          <p>{{rs}}</p>
+          {% endfor %}
+        </td>
+      </tr>
+    </table>
+    <h2>Failures</h2>
+    <table>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Occurrences</th>
+        <th>Error</th>
+      </tr>
+      <tr>
+        <td>
+          {% for method in error_method %}
+          <p>{{method}}</p>
+          {% endfor %}
+        </td>
+        <td>
+          {% for name in error_name %}
+          <p>{{name}}</p>
+          {% endfor %}
+        </td>
+        <td>
+          {% for occur in error_occur %}
+          <p>{{occur}}</p>
+          {% endfor %}
+        </td>
+        <td>
+          {% for des in error_description %}
+          <p>{{des}}</p>
+          {% endfor %}
+        </td>
+      </tr>
+    </table>
+    <h2>Distribution</h2>
+    <table>
+      <tr>
+        <th>{{distribution_header}}</th>
+      </tr>
+      {% for row in distribution_content %}
+      <tr>
+        <td>
+          <p>{{row}}</p>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </body>
 </html>
