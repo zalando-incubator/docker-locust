@@ -64,9 +64,6 @@ def generate_report(distribution_csv, template_file, report_file):
                         error_method.append(error['method'])
                         error_name.append(error['name'])
 
-                t_column = table[0]
-                table.pop(0)
-
                 rf.write(j2_env.get_template(template_file).render(
                     users=stats.get('user_count'), date=str(datetime.date.today()),
                     error_type=error_type,
@@ -82,8 +79,8 @@ def generate_report(distribution_csv, template_file, report_file):
                     max_response_time=round(float(max_response_time), 1),
                     avg_content_length=round(float(avg_content_length), 1),
                     current_rps=round(float(current_rps), 1),
-                    table_columns=t_column,
-                    table_row=table))
+                    table_columns=table[0],
+                    table_row=table[1:]))
 
 
 def download_report():
