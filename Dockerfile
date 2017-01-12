@@ -1,16 +1,28 @@
-FROM registry.opensource.zalan.do/stups/ubuntu:15.10-16
+FROM registry.opensource.zalan.do/stups/ubuntu:16.04-60
 
+#=======================
+# General Configuration
+#=======================
+ENV REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+RUN apt-get update && apt-get install -y python-dev python-zmq python-pip
+
+#==============
+# Expose Ports
+#==============
 EXPOSE 8089
 EXPOSE 5557
+EXPOSE 5558
 
-RUN apt-get update && apt-get install -y python-dev python-zmq python-pip && \
-    pip install --upgrade pip locustio requests setuptools boto3 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+#======================
+# Install dependencies
+#======================
+COPY requirements.txt /tmp/
+RUN pip install -r /tmp/requirements.txt
 
-ENV REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
-
-COPY launch-locust.py /
-
-CMD /launch-locust.py
-
+#=====================
+# Start docker-locust
+#=====================
+COPY . /opt/
+WORKDIR /opt
+ENV PYTHONPATH .
+CMD ["/usr/bin/python", "src/start.py"]
