@@ -1,6 +1,9 @@
 Locust.io Docker Image
 ======================
 
+[![Build Status](https://travis-ci.org/zalando-incubator/docker-locust.svg?branch=master)](https://travis-ci.org/zalando-incubator/docker-locust)
+[![codecov](https://codecov.io/gh/zalando-incubator/docker-locust/branch/master/graph/badge.svg)](https://codecov.io/gh/zalando-incubator/docker-locust)
+
 This docker-locust allows you to run [locust.io] in any CI tools e.g. [Jenkins] and generate HTML report at the end of load test.
 
 Requirement
