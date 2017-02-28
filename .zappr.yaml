@@ -1,3 +1,6 @@
+X-Zalando-Team: tip
+X-Zalando-Type: tools
+
 approvals:
   minimum: 1
   # approval = comment that matches this regex
