@@ -44,7 +44,7 @@ class TestEnvironmentVariable(TestCase):
 
     @mock.patch('time.sleep')
     @mock.patch('os.makedirs')
-    @mock.patch('builtins.open')
+    @mock.patch('__builtin__.open')
     @requests_mock.Mocker()
     def test_valid_controller_automatic(self, mocked_timeout, mocked_dir, mocked_open, mocked_request):
         os.environ['ROLE'] = 'controller'

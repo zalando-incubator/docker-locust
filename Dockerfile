@@ -1,9 +1,10 @@
-FROM registry.opensource.zalan.do/stups/python:3.5-cd32
+FROM registry.opensource.zalan.do/stups/ubuntu:16.04.2-5
 
 #=======================
 # General Configuration
 #=======================
 ENV REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+RUN apt-get update && apt-get install -y python-dev python-zmq python-pip
 
 #==============
 # Expose Ports

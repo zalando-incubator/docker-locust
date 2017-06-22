@@ -87,7 +87,7 @@ docker-compose logs -f
 
 About the project versioning
 ----------------------------
-A version number is combination between the locust version being supported and patch level, e.g. when a release is 0.8a1.p0, it support locust 0.8a1.
+A version number is combination between the locust version being supported and patch level, e.g. when a release is 0.7.3-p0, it support locust 0.7.3.
 
 Contributions
 -------------
