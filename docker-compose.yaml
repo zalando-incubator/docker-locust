@@ -1,21 +1,24 @@
 version: '2'
 services:
   master:
-    build: .
+    image: $IMAGE
     ports:
       - 5557-5558:5557-5558
       - 8089:8089
+    volumes:
+      - $LOCUST_DIR:/opt
     environment:
       - ROLE=master
       - TARGET_HOST=$TARGET_HOST
       - LOCUST_FILE=$LOCUST_FILE
   slave:
-    build: .
+    image: $IMAGE
     depends_on:
       - master
     network_mode: "service:master"
+    volumes:
+      - $LOCUST_DIR:/opt
     environment:
-      - DEBUG=True
       - ROLE=slave
       - MASTER_HOST=master
       - TARGET_HOST=$TARGET_HOST
@@ -25,7 +28,7 @@ services:
       - TOKEN_URL=$TOKEN_URL
       - OAUTH_SCOPE=$OAUTH_SCOPE
   controller:
-    build: .
+    image: $IMAGE
     container_name: docker_locusts_controller
     depends_on:
       - master
