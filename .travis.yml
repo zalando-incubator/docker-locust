@@ -1,10 +1,14 @@
-language: python
-python:
-  - "2.7"
-install: "pip install -r requirements.txt"
-script: nosetests
-branches:
-  only:
-  - master
+sudo: false
+
+services:
+  - docker
+
+language: bash
+
+before_install:
+  - docker -v
+
+script: bash local.sh test
+
 after_success:
   - bash <(curl -s https://codecov.io/bash)
