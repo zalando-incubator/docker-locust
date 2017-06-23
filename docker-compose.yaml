@@ -6,7 +6,7 @@ services:
       - 5557-5558:5557-5558
       - 8089:8089
     volumes:
-      - $LOCUST_DIR:/opt
+      - $LOCUST_DIR:/scripts
     environment:
       - ROLE=master
       - TARGET_HOST=$TARGET_HOST
@@ -17,7 +17,7 @@ services:
       - master
     network_mode: "service:master"
     volumes:
-      - $LOCUST_DIR:/opt
+      - $LOCUST_DIR:/scripts
     environment:
       - ROLE=slave
       - MASTER_HOST=master

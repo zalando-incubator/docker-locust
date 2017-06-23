@@ -81,7 +81,7 @@ EOF
 
     # Get directory path and file name
     DIR=$(dirname $FILE_PATH)
-    FILE=$(basename $FILE_PATH)
+    FILE=/scripts/$(basename $FILE_PATH)
 
     if [ -z "$3" ]; then
         read -p "Number of slave(s): " SLAVE

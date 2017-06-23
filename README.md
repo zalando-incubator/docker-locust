@@ -18,7 +18,7 @@ Getting Started
 Run the application with the command:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh | bash -s deploy
+bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy
 ```
 
 You will be prompted for certain inputs required
@@ -33,7 +33,7 @@ Run type [automatic/manual]: manual
 **Or you can simplify it with following command:**
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh | bash -s deploy https://targeturl.com simple.py 4 manual
+bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com simple.py 4 manual
 ```
 
 Report Generation
@@ -70,7 +70,7 @@ docker-locust can be run automatically by using CI tool like jenkins.
 1. Put following command in "Execute shell" field:
 
 	```bash
-	(echo 100 && echo 5 && echo 30) | bash local.sh deploy https://targeturl.com simple.py 4 automatic
+	(echo 100 && echo 5 && echo 30) | bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com simple.py 4 automatic
 	```
 
 2. Install [html-publisher-plugin] in jenkins to display load test result. Example configuration in jenkins job:
