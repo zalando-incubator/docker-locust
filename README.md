@@ -11,6 +11,11 @@ Requirements
 ------------
 1. [docker engine] version 1.9.1+
 2. [docker-compose] version 1.6.0+
+3. Load test script. You can use [our example].
+
+	```bash
+	export FILE=$(curl -sSL https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py > simple.py && echo simple.py)
+	```
 
 Getting Started
 ---------------
@@ -21,11 +26,9 @@ Run the application with the command:
 bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy
 ```
 
-You will be prompted for certain inputs required
-
 ```
 Target url: https://targeturl.com
-Path of load testing script: simple.py
+Path of load testing script: $FILE
 Number of slave(s): 4
 Run type [automatic/manual]: manual
 ```
@@ -33,7 +36,7 @@ Run type [automatic/manual]: manual
 **Or you can simplify it with following command:**
 
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com simple.py 4 manual
+bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com $FILE 4 manual
 ```
 
 Report Generation
@@ -70,7 +73,7 @@ docker-locust can be run automatically by using CI tool like jenkins.
 1. Put following command in "Execute shell" field:
 
 	```bash
-	(echo 100 && echo 5 && echo 30) | bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com simple.py 4 automatic
+	(echo 100 && echo 5 && echo 30) | bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com $(curl -sSL https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py > simple.py && echo simple.py) 4 automatic
 	```
 
 2. Install [html-publisher-plugin] in jenkins to display load test result. Example configuration in jenkins job:
@@ -115,6 +118,7 @@ See [Security]
 [Jenkins]: <https://jenkins.io>
 [docker engine]: <https://docs.docker.com/engine/installation/>
 [docker-compose]: <https://docs.docker.com/compose/install/>
+[our example]: <https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py>
 [html-publisher-plugin]: <https://wiki.jenkins-ci.org/display/JENKINS/HTML+Publisher+Plugin>
 [this example]: <https://github.com/zalando-incubator/docker-locust/blob/master/example/simple.py#L4-L9>
 [Download report]: <images/download_report.png> "Download report"
