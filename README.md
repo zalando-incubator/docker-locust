@@ -28,7 +28,7 @@ bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust
 
 ```
 Target url: https://targeturl.com
-Path of load testing script: $FILE
+Path of load testing script: simple.py
 Number of slave(s): 4
 Run type [automatic/manual]: manual
 ```
