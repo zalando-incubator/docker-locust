@@ -50,17 +50,6 @@ EOF
         echo -e 'File is found, download is not needed! \xE2\x9C\x94'
     fi
 
-    echo "----------------------------------------------"
-    echo " Download sample load test script (simple.py) "
-    echo "----------------------------------------------"
-    SIMPLE_SCRIPT=simple.py
-    if [ ! -f $SIMPLE_SCRIPT ]; then
-        curl -o $SIMPLE_SCRIPT https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py
-        echo -e "Download completed! \xE2\x9C\x94"
-    else
-        echo -e 'File is found, download is not needed! \xE2\x9C\x94'
-    fi
-
     if [ -z "$1" ]; then
         read -p "Target url: " TARGET
     else
