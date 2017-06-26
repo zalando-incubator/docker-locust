@@ -17,6 +17,12 @@ Requirements
 	export FILE=$(curl -sSL https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py > simple.py && echo simple.py)
 	```
 
+	OR in case your load test script is stored in s3 bucket in AWS, you can use [awscli] to download that script.
+
+	```bash
+	export FILE=$(aws s3 cp --quiet s3://mybucket/mypath/myscript.py simple.py && echo simple.py)
+	```
+
 Getting Started
 ---------------
 
@@ -119,6 +125,7 @@ See [Security]
 [docker engine]: <https://docs.docker.com/engine/installation/>
 [docker-compose]: <https://docs.docker.com/compose/install/>
 [our example]: <https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py>
+[awscli]: <http://docs.aws.amazon.com/cli/latest/userguide/installing.html>
 [html-publisher-plugin]: <https://wiki.jenkins-ci.org/display/JENKINS/HTML+Publisher+Plugin>
 [this example]: <https://github.com/zalando-incubator/docker-locust/blob/master/example/simple.py#L4-L9>
 [Download report]: <images/download_report.png> "Download report"
