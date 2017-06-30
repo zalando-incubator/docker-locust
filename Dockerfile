@@ -1,4 +1,4 @@
-FROM registry.opensource.zalan.do/stups/ubuntu:16.04.2-5
+FROM registry.opensource.zalan.do/stups/ubuntu:16.04.2-6
 
 #=======================
 # General Configuration
