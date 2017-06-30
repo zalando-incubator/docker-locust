@@ -22,7 +22,8 @@ RUN pip install -r /tmp/requirements.txt
 #=====================
 # Start docker-locust
 #=====================
-COPY . /opt/
+COPY src /opt/src/
+COPY setup.cfg /opt/
 WORKDIR /opt
 ENV PYTHONPATH .
 CMD ["/usr/bin/python", "src/start.py"]

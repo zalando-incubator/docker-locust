@@ -10,3 +10,6 @@ coverage/*
 
 # Reports
 reports/*
+
+# Sample load test script
+simple.py
