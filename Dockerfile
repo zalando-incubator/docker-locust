@@ -1,4 +1,4 @@
-FROM registry.opensource.zalan.do/stups/ubuntu:16.04.2-5
+FROM registry.opensource.zalan.do/stups/ubuntu:16.04.2-6
 
 #=======================
 # General Configuration
@@ -22,7 +22,8 @@ RUN pip install -r /tmp/requirements.txt
 #=====================
 # Start docker-locust
 #=====================
-COPY . /opt/
+COPY src /opt/src/
+COPY setup.cfg /opt/
 WORKDIR /opt
 ENV PYTHONPATH .
 CMD ["/usr/bin/python", "src/start.py"]
