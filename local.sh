@@ -39,6 +39,17 @@ EOF
     IMAGE="registry.opensource.zalan.do/tip/docker-locust:0.7.3-p2"
     echo "Used image: $IMAGE"
 
+    echo "----------------------------------------------"       
+    echo "             Download compose file            "     
+    echo "----------------------------------------------"     
+    COMPOSE_FILE=docker-compose.yaml      
+    if [ ! -f $COMPOSE_FILE ]; then       
+        curl -o $COMPOSE_FILE https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/docker-compose.yaml        
+        echo -e "Download completed! \xE2\x9C\x94"        
+    else      
+        echo -e 'File is found, download is not needed! \xE2\x9C\x94'     
+    fi
+
     if [ -z "$1" ]; then
         read -p "Target url: " TARGET
     else
