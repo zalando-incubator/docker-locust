@@ -5,28 +5,21 @@ services:
     ports:
       - 5557-5558:5557-5558
       - 8089:8089
-    volumes:
-      - $LOCUST_DIR:/scripts
     environment:
       - ROLE=master
       - TARGET_HOST=$TARGET_HOST
-      - LOCUST_FILE=$LOCUST_FILE
+      - LOCUST_FILE_URL=$LOCUST_FILE_URL
   slave:
     image: $IMAGE
     depends_on:
       - master
     network_mode: "service:master"
-    volumes:
-      - $LOCUST_DIR:/scripts
     environment:
       - ROLE=slave
       - MASTER_HOST=master
       - TARGET_HOST=$TARGET_HOST
-      - LOCUST_FILE=$LOCUST_FILE
+      - LOCUST_FILE_URL=$LOCUST_FILE_URL
       - SLAVE_MUL=$SLAVE_NUM
-      - OAUTH=$OAUTH
-      - TOKEN_URL=$TOKEN_URL
-      - OAUTH_SCOPE=$OAUTH_SCOPE
   controller:
     image: $IMAGE
     container_name: docker_locusts_controller

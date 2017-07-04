@@ -26,4 +26,4 @@ COPY src /opt/src/
 COPY setup.cfg /opt/
 WORKDIR /opt
 ENV PYTHONPATH .
-CMD ["/usr/bin/python", "src/start.py"]
+CMD ["/usr/bin/python", "src/app.py"]

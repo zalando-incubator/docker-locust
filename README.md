@@ -11,17 +11,7 @@ Requirements
 ------------
 1. [docker engine] version 1.9.1+
 2. [docker-compose] version 1.6.0+
-3. Load test script. You can use [our example].
 
-	```bash
-	export FILE=$(curl -sSL https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py > simple.py && echo simple.py)
-	```
-
-	OR in case your load test script is stored in s3 bucket in AWS, you can use [awscli] to download that script.
-
-	```bash
-	export FILE=$(aws s3 cp --quiet s3://mybucket/mypath/myscript.py simple.py && echo simple.py)
-	```
 
 Getting Started
 ---------------
@@ -32,17 +22,25 @@ Run the application with the command:
 bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy
 ```
 
+You will be prompted for certains inputs required (You can use [our example] in github as load test script).
+
 ```
 Target url: https://targeturl.com
-Path of load testing script: simple.py
+Url where load test script is stored: https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py
 Number of slave(s): 4
 Run type [automatic/manual]: manual
 ```
 
-**Or you can simplify it with following command:**
+*All of it can be simplify in one line:*
 
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com $FILE 4 manual
+bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py 4 manual
+```
+
+You can also use your own load test script that is stored in **AWS S3**. e.g:
+
+```bash
+bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com s3://mybucket/mypath/myscript.py 4 manual
 ```
 
 Report Generation
