@@ -36,19 +36,8 @@ ________________________________________________________________________________
 _________________________________________________________________________________
 EOF
 
-    IMAGE="registry.opensource.zalan.do/tip/docker-locust:0.7.3-p1"
+    IMAGE="registry.opensource.zalan.do/tip/docker-locust:0.7.3-p2"
     echo "Used image: $IMAGE"
-
-    echo "----------------------------------------------"
-    echo "             Download compose file            "
-    echo "----------------------------------------------"
-    COMPOSE_FILE=docker-compose.yaml
-    if [ ! -f $COMPOSE_FILE ]; then
-        curl -o $COMPOSE_FILE https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/docker-compose.yaml
-        echo -e "Download completed! \xE2\x9C\x94"
-    else
-        echo -e 'File is found, download is not needed! \xE2\x9C\x94'
-    fi
 
     if [ -z "$1" ]; then
         read -p "Target url: " TARGET
@@ -57,20 +46,10 @@ EOF
     fi
 
     if [ -z "$2" ]; then
-        read -p "Path of load testing script (e.g. simple.py): " FILE_PATH
+        read -p "Url where load test script is stored (e.g. https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py): " LOCUST_FILE_URL
     else
-        FILE_PATH=$2
+        LOCUST_FILE_URL=$2
     fi
-
-    # Check if given load test script does exist
-    if [ ! -f $FILE_PATH ]; then
-        echo "Load testing script with path '$FILE_PATH' not found!"
-        exit 1
-    fi
-
-    # Get directory path and file name
-    DIR=$(dirname $FILE_PATH)
-    FILE=/scripts/$(basename $FILE_PATH)
 
     if [ -z "$3" ]; then
         read -p "Number of slave(s): " SLAVE
@@ -98,9 +77,7 @@ EOF
     echo "----------------------------------------------"
     echo "DOCKER_IMAGE: $IMAGE"
     echo "TARGET_URL: $TARGET"
-    echo "LOCUST_PATH: $FILE_PATH"
-    echo "LOCUST_DIR: $DIR"
-    echo "LOCUST_FILE: $FILE"
+    echo "LOCUST_FILE_URL: $LOCUST_FILE_URL"
     echo "SLAVE NUMBER: $SLAVE"
     echo "RUN_TYPE: $TYPE || automatic=$AUTOMATIC"
     echo "NUMBER OF USERS: $USERS"
@@ -118,10 +95,9 @@ EOF
     rm -rf reports
 
     echo "Deploy Locust application locally"
-    (export IMAGE=$IMAGE && export TARGET_HOST=$TARGET && export LOCUST_PATH=$FILE_PATH && export LOCUST_DIR=$DIR &&
-    export LOCUST_FILE=$FILE && export SLAVE_NUM=$SLAVE && export OAUTH=$OAUTH &&
-    export TOKEN_URL=$TOKEN_URL && export OAUTH_SCOPE=$OAUTH_SCOPE && export AUTOMATIC=$AUTOMATIC &&
-    export USERS=$USERS && export HATCH_RATE=$HATCH_RATE && export DURATION=$DURATION && docker-compose up -d)
+    (export IMAGE=$IMAGE && export TARGET_HOST=$TARGET && export LOCUST_FILE_URL=$LOCUST_FILE_URL &&
+    export SLAVE_NUM=$SLAVE && export AUTOMATIC=$AUTOMATIC && export USERS=$USERS &&
+    export HATCH_RATE=$HATCH_RATE && export DURATION=$DURATION && docker-compose up -d)
 
     echo "Locust application is successfully deployed. you can access http://<docker-host-ip-address>:8089"
 

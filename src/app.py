@@ -3,6 +3,7 @@
 import logging
 import multiprocessing
 import os
+import sys
 import signal
 import subprocess
 
@@ -16,7 +17,6 @@ logger = logging.getLogger('bootstrap')
 def bootstrap():
     """
     Initialize role of running docker container.
-
     master: web interface / API.
     slave: node that load test given url.
     controller: node that control the automatic run.
@@ -26,17 +26,18 @@ def bootstrap():
 
     if role == 'master':
         target_host = get_or_raise('TARGET_HOST')
-        locust_file = get_or_raise('LOCUST_FILE')
+        locust_file = get_locust_file()
         logger.info('target host: {target}, locust file: {file}'.format(target=target_host, file=locust_file))
 
-        processes.append(subprocess.Popen([
+        s = subprocess.Popen([
             'locust', '-H', target_host, '--loglevel', 'debug', '--master', '-f', locust_file
-        ]).communicate())
+        ])
+        processes.append(s)
 
     elif role == 'slave':
         try:
             target_host = get_or_raise('TARGET_HOST')
-            locust_file = get_or_raise('LOCUST_FILE')
+            locust_file = get_locust_file()
             master_host = get_or_raise('MASTER_HOST')
             multiplier = int(os.getenv('SLAVE_MUL', (multiprocessing.cpu_count() * 2) + 1))
         except ValueError as verr:
@@ -53,7 +54,7 @@ def bootstrap():
             processes.append(s)
 
     elif role == 'controller':
-        automatic = str_to_bool(os.getenv('AUTOMATIC', str(False)))
+        automatic = convert_str_to_bool(os.getenv('AUTOMATIC', str(False)))
         logger.info('Automatic run: {auto}'.format(auto=automatic))
 
         if automatic:
@@ -107,7 +108,50 @@ def bootstrap():
         s.communicate()
 
 
-def str_to_bool(str):
+def get_locust_file():
+    """
+    Download locust file from given url.
+
+    :return: file_name
+    """
+
+    url = get_or_raise('LOCUST_FILE_URL')
+    file_name = None
+
+    if url.startswith('s3://'):
+        _, _, bucket, path = url.split('/', 3)
+        file_name = os.path.basename(url)
+
+        import boto3
+        import botocore
+        s3 = boto3.resource('s3')
+
+        try:
+            s3.Bucket(bucket).download_file(path, file_name)
+        except botocore.exceptions.ClientError as e:
+            if e.response['Error']['Code'] == "404":
+                logger.error('File cannot be found!')
+            else:
+                raise
+    else:
+        import wget
+        try:
+            file_name = wget.download(url)
+        except:
+            logger.error('File cannot be downloaded! Please check given url!')
+
+    if not file_name:
+        logger.error('File is empty')
+        sys.exit(1)
+
+    if not str(file_name).endswith('.py'):
+        logger.error('It is not a python file!')
+        sys.exit(1)
+
+    return file_name
+
+
+def convert_str_to_bool(str):
     """
     Convert string to boolean.
 
@@ -116,7 +160,10 @@ def str_to_bool(str):
     :return: converted string
     :rtype: bool
     """
-    return str.lower() in ('yes', 'true', 't', '1')
+    if isinstance(str, basestring):
+        return str.lower() in ('yes', 'true', 't', '1')
+    else:
+        return False
 
 
 def get_or_raise(env):
