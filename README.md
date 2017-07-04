@@ -77,7 +77,7 @@ docker-locust can be run automatically by using CI tool like jenkins.
 1. Put following command in "Execute shell" field:
 
 	```bash
-	(echo 100 && echo 5 && echo 30) | bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com $(curl -sSL https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py > simple.py && echo simple.py) 4 automatic
+	(echo 100 && echo 5 && echo 30) | bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py 4 automatic
 	```
 
 2. Install [html-publisher-plugin] in jenkins to display load test result. Example configuration in jenkins job:
