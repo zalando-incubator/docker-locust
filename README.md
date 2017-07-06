@@ -97,6 +97,46 @@ About the project versioning
 ----------------------------
 A version number is combination between the locust version being supported and patch level, e.g. when a release is 0.7.3-p0, it support locust 0.7.3.
 
+Capacity of docker-locust in AWS
+--------------------------------
+
+All the data based on load testing against simple [hello-world] application.
+
+|No.   |Group Type   |EC2   |vCPU   |RAM (GiB)   |Clock Speed (GHz)   |Enhanced Networking   |Max total RPS that can be created per 1 slave machine (rough number)   |Price per hour (EU - Frankfurt)   |RPS per cent   |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+|1|General Purpose|t2.nano|1|0.5|up to 3.3|-|200|$0.0068|294.12|
+|2|General Purpose|t2.micro|1|1|up to 3.3|-|500|$0.014|357.14|
+|3|General Purpose|t2.small|1|2|up to 3.3|-|500|$0.027|185.19|
+|4|General Purpose|t2.medium|2|4|up to 3.3|-|1100|$0.054|203.7|
+|5|General Purpose|t2.large|2|8|up to 3.0|-|1100|$0.108|101.85|
+|6|General Purpose|t2.xlarge|4|16|up to 3.0|-|2200|$0.216|101.85|
+|7|General Purpose|t2.2xlarge|8|32|up to 3.0|-|4700|$0.432|108.8|
+|8|General Purpose|m4.large|2|8|2.4|Yes|700|$0.12|58.33|
+|9|General Purpose|m4.xlarge|4|16|2.4|Yes|1500|$0.24|62.5|
+|10|General Purpose|m4.2xlarge|8|32|2.4|Yes|2500|$0.48|52.08|
+|11|General Purpose|m4.4xlarge|16|64|2.4|Yes|6500|$0.96|67.71|
+|12|General Purpose|m4.10xlarge|40|160|2.4|Yes|10000|$2.4|41.67|
+|13|General Purpose|m4.16xlarge|64|256|2.3|Yes|17000|$3.84|44.27|
+|14|General Purpose|m3.medium|1|3.75|2.5|-|250|$0.079|31.65|
+|15|General Purpose|m3.large|2|7.5|2.5|-|600|$0.158|37.97|
+|16|General Purpose|m3.xlarge|4|15|2.5|-|1300|$0.315|41.27|
+|17|General Purpose|m3.2xlarge|8|30|2.5|-|2600|$0.632|41.14|
+|18|Compute Optimized|c4.large|2|3.75|2.9|Yes|800|$0.114|70.18|
+|19|Compute Optimized|c4.xlarge|4|7.5|2.9|Yes|1600|$0.227|70.48|
+|20|Compute Optimized|c4.2xlarge|8|15|2.9|Yes|2500|$0.454|55.07|
+|21|Compute Optimized|c4.4xlarge|16|30|2.9|Yes|6500|$0.909|71.51|
+|22|Compute Optimized|c4.8xlarge|36|60|2.9|Yes|12500|$1.817|68.79|
+|23|Compute Optimized|c3.large|2|3.75|2.8|Yes|650|$0.129|50.39|
+|24|Compute Optimized|c3.xlarge|4|7.5|2.8|Yes|1300|$0.258|50.39|
+|25|Compute Optimized|c3.2xlarge|8|15|2.8|Yes|2500|$0.516|48.45|
+|26|Compute Optimized|c3.4xlarge|16|30|2.8|Yes|5500|$1.032|53.29|
+|27|Compute Optimized|c3.8xlarge|32|60|2.8|Yes|9000|$2.064|43.6|
+
+**NOTE:**
+
+1. Please check [AWS-EC2-Type] and [AWS-EC2-pricing] before use data above, because some of them could be changed time to time.
+2. Number of total RPS could be different because of n reasons.
+
 Contributions
 -------------
 Any feedback or contributions are welcome! Please check our [guidelines].
@@ -128,6 +168,9 @@ See [Security]
 [this example]: <https://github.com/zalando-incubator/docker-locust/blob/master/example/simple.py#L4-L9>
 [Download report]: <images/download_report.png> "Download report"
 [HTML-Publisher configuration]: <images/usage_html_publisher.png> "Example configuration of HTML Publisher in jenkins job"
+[hello-world]: <https://github.com/zalando-incubator/docker-locust/blob/master/flask-sample/app.py>
+[AWS-EC2-Type]: <https://aws.amazon.com/ec2/instance-types/>
+[AWS-EC2-pricing]: <https://aws.amazon.com/ec2/pricing/on-demand/?nc1=h_ls>
 [guidelines]: <CONTRIBUTING.md>
 [maintainers]: <MAINTAINERS>
 [License]: <LICENSE>
