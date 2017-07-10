@@ -5,6 +5,8 @@ services:
     ports:
       - 5557-5558:5557-5558
       - 8089:8089
+    volumes:
+      - ~/.aws:/root/.aws
     environment:
       - ROLE=master
       - TARGET_HOST=$TARGET_HOST
@@ -14,6 +16,8 @@ services:
     depends_on:
       - master
     network_mode: "service:master"
+    volumes:
+      - ~/.aws:/root/.aws
     environment:
       - ROLE=slave
       - MASTER_HOST=master
