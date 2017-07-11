@@ -36,7 +36,7 @@ ________________________________________________________________________________
 _________________________________________________________________________________
 EOF
 
-    IMAGE="registry.opensource.zalan.do/tip/docker-locust:0.7.3-p2"
+    IMAGE="registry.opensource.zalan.do/tip/docker-locust:0.7.3-p3"
     echo "Used image: $IMAGE"
 
     echo "----------------------------------------------"       
@@ -57,9 +57,9 @@ EOF
     fi
 
     if [ -z "$2" ]; then
-        read -p "Url where load test script is stored (e.g. https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py): " LOCUST_FILE_URL
+        read -p "Where load test script is stored (e.g. https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py): " LOCUST_FILE
     else
-        LOCUST_FILE_URL=$2
+        LOCUST_FILE=$2
     fi
 
     if [ -z "$3" ]; then
@@ -88,7 +88,7 @@ EOF
     echo "----------------------------------------------"
     echo "DOCKER_IMAGE: $IMAGE"
     echo "TARGET_URL: $TARGET"
-    echo "LOCUST_FILE_URL: $LOCUST_FILE_URL"
+    echo "LOCUST_FILE: $LOCUST_FILE"
     echo "SLAVE NUMBER: $SLAVE"
     echo "RUN_TYPE: $TYPE || automatic=$AUTOMATIC"
     echo "NUMBER OF USERS: $USERS"
@@ -106,7 +106,7 @@ EOF
     rm -rf reports
 
     echo "Deploy Locust application locally"
-    (export IMAGE=$IMAGE && export TARGET_HOST=$TARGET && export LOCUST_FILE_URL=$LOCUST_FILE_URL &&
+    (export IMAGE=$IMAGE && export TARGET_HOST=$TARGET && export LOCUST_FILE=$LOCUST_FILE &&
     export SLAVE_NUM=$SLAVE && export AUTOMATIC=$AUTOMATIC && export USERS=$USERS &&
     export HATCH_RATE=$HATCH_RATE && export DURATION=$DURATION && docker-compose up -d)
 

@@ -10,5 +10,6 @@ app = Flask(__name__)
 def index():
     return Response(response=json.dumps({'Hello': 'World'}), content_type='application/json')
 
+
 if __name__ == '__main__':
     app.run()
