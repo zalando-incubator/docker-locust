@@ -12,7 +12,6 @@ Requirements
 1. [docker engine] version 1.9.1+
 2. [docker-compose] version 1.6.0+
 
-
 Getting Started
 ---------------
 
@@ -26,7 +25,7 @@ You will be prompted for certains inputs required (You can use [our example] in 
 
 ```
 Target url: https://targeturl.com
-Url where load test script is stored: https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py
+Where load test script is stored: https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py
 Number of slave(s): 4
 Run type [automatic/manual]: manual
 ```
@@ -37,10 +36,16 @@ Run type [automatic/manual]: manual
 bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py 4 manual
 ```
 
-You can also use your own load test script that is stored in **AWS S3**. e.g:
+OR you can also use your own load test script that is stored in **AWS S3**. e.g:
 
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com s3://mybucket/mypath/myscript.py 4 manual
+```
+
+OR load test script that is stored in **your local machine** in your current / work directory. e.g.:
+
+```bash
+bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com myfolder/myscript.py 4 manual
 ```
 
 Report Generation

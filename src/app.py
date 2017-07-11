@@ -110,17 +110,23 @@ def bootstrap():
 
 def get_locust_file():
     """
-    Download locust file from given url.
+    Get locust file from different parameters.
+    Possible parameters are:
+    1. S3 Bucket
+    2. Any http or https url e.g. raw url from GitHub
+    3. File from 'locust-script' folder
 
     :return: file_name
     """
 
-    url = get_or_raise('LOCUST_FILE_URL')
+    given_input = get_or_raise('LOCUST_FILE')
     file_name = None
 
-    if url.startswith('s3://'):
-        _, _, bucket, path = url.split('/', 3)
-        file_name = os.path.basename(url)
+    # Download from s3 bucket
+    if given_input.startswith('s3://'):
+        logger.info('Load test script from s3 bucket')
+        _, _, bucket, path = given_input.split('/', 3)
+        file_name = os.path.basename(given_input)
 
         import boto3
         import botocore
@@ -133,12 +139,17 @@ def get_locust_file():
                 logger.error('File cannot be found!')
             else:
                 raise
-    else:
+
+    elif given_input.startswith('http'):
+        logger.info('Load test script from http or https url')
         import wget
         try:
-            file_name = wget.download(url)
+            file_name = wget.download(given_input)
         except:
             logger.error('File cannot be downloaded! Please check given url!')
+    else:
+        logger.info('Load test script from local machine')
+        file_name = given_input
 
     if not file_name:
         logger.error('File is empty')

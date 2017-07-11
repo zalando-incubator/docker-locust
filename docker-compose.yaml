@@ -7,10 +7,11 @@ services:
       - 8089:8089
     volumes:
       - ~/.aws:/root/.aws
+      - ./:/opt
     environment:
       - ROLE=master
       - TARGET_HOST=$TARGET_HOST
-      - LOCUST_FILE_URL=$LOCUST_FILE_URL
+      - LOCUST_FILE=$LOCUST_FILE
   slave:
     image: $IMAGE
     depends_on:
@@ -18,11 +19,12 @@ services:
     network_mode: "service:master"
     volumes:
       - ~/.aws:/root/.aws
+      - ./:/opt
     environment:
       - ROLE=slave
       - MASTER_HOST=master
       - TARGET_HOST=$TARGET_HOST
-      - LOCUST_FILE_URL=$LOCUST_FILE_URL
+      - LOCUST_FILE=$LOCUST_FILE
       - SLAVE_MUL=$SLAVE_NUM
   controller:
     image: $IMAGE
