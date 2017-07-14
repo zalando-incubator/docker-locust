@@ -149,7 +149,7 @@ def get_locust_file():
             logger.error('File cannot be downloaded! Please check given url!')
     else:
         logger.info('Load test script from local machine')
-        file_name = given_input
+        file_name = '/'.join(['script', given_input])
 
     if not file_name:
         logger.error('File is empty')
