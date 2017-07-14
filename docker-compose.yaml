@@ -7,7 +7,7 @@ services:
       - 8089:8089
     volumes:
       - ~/.aws:/root/.aws
-      - ./:/opt
+      - ./:/opt/script
     environment:
       - ROLE=master
       - TARGET_HOST=$TARGET_HOST
@@ -19,7 +19,7 @@ services:
     network_mode: "service:master"
     volumes:
       - ~/.aws:/root/.aws
-      - ./:/opt
+      - ./:/opt/script
     environment:
       - ROLE=slave
       - MASTER_HOST=master

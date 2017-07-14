@@ -51,5 +51,6 @@ class TestGetLocustFile(TestCase):
 
     def test_local_file(self):
         LOCAL_FILE = 'folder/file.py'
+        CONTAINER_FILE = 'script/' + 'folder/file.py'
         os.environ[self.url_key] = LOCAL_FILE
-        self.assertEquals(LOCAL_FILE, app.get_locust_file())
+        self.assertEquals(CONTAINER_FILE, app.get_locust_file())
