@@ -2,6 +2,7 @@ version: '2'
 services:
   master:
     image: $IMAGE
+    container_name: docker_locusts_master
     ports:
       - 5557-5558:5557-5558
       - 8089:8089
