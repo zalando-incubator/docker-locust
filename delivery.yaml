@@ -1,0 +1,17 @@
+build_steps:
+  - desc: Install Docker
+    cmd: |
+      # Docker
+      curl -fLOsS https://delivery.cloud.zalando.com/utils/ensure-docker && sh ensure-docker && rm ensure-docker
+  - desc: Build and push docker image
+    cmd: |
+      IS_PR_BUILD=${CDP_PULL_REQUEST_NUMBER+"true"}
+      echo $IS_PR_BUILD
+      if [[ ${IS_PR_BUILD} != "true" ]]; then
+        echo "Build image"
+        GIT_TAG=$(git describe --tags --always --dirty)
+        IMAGE=registry-write.opensource.zalan.do/tip/docker-locust:${GIT_TAG}
+        docker build -t $IMAGE .
+        echo "Push image"
+        docker push $IMAGE
+      fi
