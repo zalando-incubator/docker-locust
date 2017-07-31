@@ -36,7 +36,7 @@ ________________________________________________________________________________
 _________________________________________________________________________________
 EOF
 
-    IMAGE="registry.opensource.zalan.do/tip/docker-locust:0.7.3-p4"
+    IMAGE="registry.opensource.zalan.do/tip/docker-locust"
     echo "Used image: $IMAGE"
 
     echo "----------------------------------------------"       
