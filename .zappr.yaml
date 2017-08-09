@@ -2,7 +2,7 @@ X-Zalando-Team: tip
 X-Zalando-Type: tools
 
 approvals:
-  minimum: 1
+  minimum: 2
   # approval = comment that matches this regex
   pattern: "^(:\\+1:|👍)"
   # note that `from` is by default empty,
