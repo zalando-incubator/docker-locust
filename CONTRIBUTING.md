@@ -35,7 +35,7 @@ yourself, or create a new one that you would like work on and discuss your ideas
 - Write good commit messages (see below).
 - Push your changes to a topic branch in your fork of the repository.
 - Submit a pull request
-- Your pull request must receive a :thumbsup: from one of these [maintainers](https://github.com/zalando-incubator/docker-locust/blob/master/MAINTAINERS).
+- Your pull request must receive a :thumbsup: from two [maintainers](https://github.com/zalando-incubator/docker-locust/blob/master/MAINTAINERS).
 
 Thanks for your contributions!
 
