@@ -5,7 +5,15 @@ Docker-Locust
 [![codecov](https://codecov.io/gh/zalando-incubator/docker-locust/branch/master/graph/badge.svg)](https://codecov.io/gh/zalando-incubator/docker-locust)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5a235d56b27647f9b73982933c00314a)](https://www.codacy.com/app/butomo1989/docker-locust?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=zalando-incubator/docker-locust&amp;utm_campaign=Badge_Grade)
 
-This docker-locust allows you to run [locust.io] in any CI tools e.g. [Jenkins] and generate HTML report at the end of load test. It is also possible to be deployed in Amazon Web Services to create bigger load.
+The purpose of this project is to provide a ready and easy-to-use version of [locust.io] which also contains additional/useful features that are required.
+
+Key advantages
+--------------
+
+1. It allows users to upload load test scenario/script from different resources (any HTTP/HTTPS URL, S3 bucket, and local machine).
+2. It has the ability to be run in any CI tool e.g. Jenkins (It can start/stop load test automatically) and provides an HTML report at the end of a load test.
+3. It is also possible to be deployed in AWS to create bigger load.
+4. Open source with more useful features coming.
 
 Requirements
 ------------
