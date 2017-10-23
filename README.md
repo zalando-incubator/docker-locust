@@ -1,5 +1,6 @@
 Docker-Locust
 =============
+build test
 
 [![Build Status](https://travis-ci.org/zalando-incubator/docker-locust.svg?branch=master)](https://travis-ci.org/zalando-incubator/docker-locust)
 [![codecov](https://codecov.io/gh/zalando-incubator/docker-locust/branch/master/graph/badge.svg)](https://codecov.io/gh/zalando-incubator/docker-locust)
