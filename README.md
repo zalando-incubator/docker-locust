@@ -56,6 +56,14 @@ OR load test script that is stored in **your local machine** in your current / w
 bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com myfolder/myscript.py 4 manual
 ```
 
+Read multiple files
+-------------------
+docker-locust has the ability to read multiple files from s3 or any http/https, e.g. [1 file is the load test file / python file](https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple_post.py) and [1 other file is json file](https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/payloads.json) where payloads are stored. Sample command:
+
+```bash
+bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple_post.py,https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/payloads.json 4 manual
+```
+
 Report Generation
 -----------------
 
