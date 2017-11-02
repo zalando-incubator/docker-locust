@@ -1,11 +1,12 @@
 #!/usr/bin/env python2
 
 import logging
+
 import multiprocessing
 import os
-import sys
 import signal
 import subprocess
+import sys
 
 import requests
 
@@ -110,56 +111,80 @@ def bootstrap():
 
 def get_locust_file():
     """
-    Get locust file from different parameters.
+    Find locust file.
     Possible parameters are:
     1. S3 Bucket
     2. Any http or https url e.g. raw url from GitHub
     3. File from 'locust-script' folder
 
     :return: file_name
+    :rtype: str
     """
 
-    given_input = get_or_raise('LOCUST_FILE')
+    files = get_files()
     file_name = None
 
-    # Download from s3 bucket
-    if given_input.startswith('s3://'):
-        logger.info('Load test script from s3 bucket')
-        _, _, bucket, path = given_input.split('/', 3)
-        file_name = os.path.basename(given_input)
+    for file in files:
+        # Download from s3 bucket
+        if file.startswith('s3://'):
+            if file.endswith('.py'):
+                file_name = os.path.basename(file)
+            _, _, bucket, path = file.split('/', 3)
+            f = os.path.basename(file)
 
-        import boto3
-        import botocore
-        s3 = boto3.resource('s3')
+            import boto3
+            import botocore
+            s3 = boto3.resource('s3')
 
-        try:
-            s3.Bucket(bucket).download_file(path, file_name)
-        except botocore.exceptions.ClientError as e:
-            if e.response['Error']['Code'] == "404":
-                logger.error('File cannot be found!')
-            else:
-                raise
-
-    elif given_input.startswith('http'):
-        logger.info('Load test script from http or https url')
-        import wget
-        try:
-            file_name = wget.download(given_input)
-        except:
-            logger.error('File cannot be downloaded! Please check given url!')
-    else:
-        logger.info('Load test script from local machine')
-        file_name = '/'.join(['script', given_input])
-
-    if not file_name:
-        logger.error('File is empty')
-        sys.exit(1)
-
-    if not str(file_name).endswith('.py'):
-        logger.error('It is not a python file!')
-        sys.exit(1)
-
+            try:
+                s3.Bucket(bucket).download_file(path, f)
+            except botocore.exceptions.ClientError as e:
+                if e.response['Error']['Code'] == "404":
+                    logger.error('File cannot be found!')
+                else:
+                    raise
+        # Download from http or https
+        elif file.startswith('http'):
+            logger.info('Load test script from http or https url')
+            import wget
+            try:
+                if file.endswith('.py'):
+                    file_name = wget.download(file)
+                else:
+                    wget.download(file)
+            except:
+                logger.error('File cannot be downloaded! Please check given url!')
+        # Share volume with local machine
+        else:
+            logger.info('Load test script from local machine')
+            if file.endswith('.py'):
+                file_name = '/'.join(['script', file])
+    logger.info('load test file: {f}'.format(f=file_name))
     return file_name
+
+
+def get_files():
+    """
+    Check user input and return all valid files.
+
+    :return: files
+    :rtype: list
+    """
+    given_input = get_or_raise('LOCUST_FILE')
+    logger.info('Given input: {input}'.format(input=given_input))
+    files = [i.strip() for i in given_input.split(',')]
+    logger.info('Files: {files}'.format(files=files))
+
+    python_files = [file for file in files if str(file).endswith('py')]
+    if not python_files:
+        logger.error('There is no python file!')
+        sys.exit(1)
+    elif python_files.__len__() > 1:
+        logger.error('There are more than 1 python files!')
+        sys.exit(1)
+    else:
+        logger.info('Check passed!')
+        return files
 
 
 def convert_str_to_bool(str):

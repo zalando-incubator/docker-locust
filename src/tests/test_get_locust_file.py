@@ -11,46 +11,76 @@ class TestGetLocustFile(TestCase):
     """Unit test class to test method get_locust_file."""
 
     def setUp(self):
-        self.url_key = 'LOCUST_FILE'
+        self.file_input = 'LOCUST_FILE'
+        self.s3_link = 's3://bucket/path'
+        self.github_link = 'https://raw.github.com/org/repo/master'
+        self.file_name = 'file.py'
+        self.json_name = 'payloads.json'
 
     def tearDown(self):
-        if os.getenv(self.url_key):
-            del os.environ[self.url_key]
+        if os.getenv(self.file_input):
+            del os.environ[self.file_input]
 
     @mock.patch('boto3.resource')
-    def test_valid_s3(self, boto_client):
-        with mock.patch('botocore.exceptions.ClientError') as boto_core:
-            boto_client.return_value.Bucket.return_value.download_file.return_value = None
+    def test_valid_s3_link(self, mocked_boto):
+        os.environ[self.file_input] = '/'.join([self.s3_link, self.file_name])
+        mocked_boto.return_value.Bucket.return_value.download_file.return_value = self.file_name
+        self.assertEqual(self.file_name, app.get_locust_file())
 
-            os.environ[self.url_key] = 's3://bucket/path/file.py'
+    @mock.patch('boto3.resource')
+    def test_valid_multiple_s3_links(self, mocked_boto):
+        lt_script = '/'.join([self.s3_link, self.file_name])
+        payload = '/'.join([self.s3_link, self.json_name])
+        os.environ[self.file_input] = ','.join([lt_script, payload])
+        mocked_boto.return_value.Bucket.return_value.download_file.return_value = self.file_name
+        self.assertEqual(self.file_name, app.get_locust_file())
+
+    @mock.patch('boto3.resource')
+    def test_download_failure_in_s3(self, mocked_boto):
+        with mock.patch('botocore.exceptions.ClientError') as boto_core:
+            os.environ[self.file_input] = '/'.join([self.s3_link, self.file_name])
+            mocked_boto.return_value.Bucket.return_value.download_file.return_value = None
             app.get_locust_file()
             self.assertFalse(boto_core.called)
 
     @mock.patch('wget.download')
-    def test_valid_https(self, wget):
-        FILE_NAME = 'file.py'
-        os.environ[self.url_key] = '/'.join(['https://raw.githubusercontent.com/org/repo/master', FILE_NAME])
-        wget.return_value = FILE_NAME
-        self.assertEqual(FILE_NAME, app.get_locust_file())
+    def test_valid_https_link(self, mocked_wget):
+        os.environ[self.file_input] = '/'.join([self.github_link, self.file_name])
+        mocked_wget.return_value = self.file_name
+        self.assertEqual(self.file_name, app.get_locust_file())
 
     @mock.patch('wget.download')
-    def test_no_file(self, wget):
-        with self.assertRaises(SystemExit) as exit_code:
-            os.environ[self.url_key] = 'https://raw.githubusercontent.com/org/repo/master/no_file.py'
-            wget.return_value = None
-            app.get_locust_file()
-        self.assertEqual(exit_code.exception.code, 1)
+    def test_valid_multiple_https_links(self, mocked_wget):
+        lt_script = '/'.join([self.github_link, self.file_name])
+        payload = '/'.join([self.github_link, self.json_name])
+        os.environ[self.file_input] = ','.join([lt_script, payload])
+        mocked_wget.return_value = self.file_name
+        self.assertEqual(self.file_name, app.get_locust_file())
 
+    def test_valid_local_file(self):
+        os.environ[self.file_input] = self.file_name
+        FILE_PATH_IN_CONTAINER = '/'.join(['script', self.file_name])
+        self.assertEquals(FILE_PATH_IN_CONTAINER, app.get_locust_file())
+
+    @mock.patch('boto3.resource')
     @mock.patch('wget.download')
-    def test_no_python_file(self, wget):
+    def test_cross_ressources(self, mocked_boto, mocked_wget):
+        lt_script = '/'.join([self.s3_link, self.file_name])
+        payload = '/'.join([self.github_link, self.json_name])
+        os.environ[self.file_input] = ','.join([lt_script, payload])
+        mocked_boto.return_value.Bucket.return_value.download_file.return_value = self.file_name
+        self.assertEqual(self.file_name, app.get_locust_file())
+
+    def test_no_python_file(self):
+        os.environ[self.file_input] = '/'.join([self.github_link, 'wrong_file.xml'])
         with self.assertRaises(SystemExit) as exit_code:
-            os.environ[self.url_key] = 'https://raw.githubusercontent.com/org/repo/master/wrong_type.json'
-            wget.return_value = 'wrong_type.json'
-            app.get_locust_file()
+            app.get_files()
         self.assertEqual(exit_code.exception.code, 1)
 
-    def test_local_file(self):
-        LOCAL_FILE = 'folder/file.py'
-        CONTAINER_FILE = 'script/' + 'folder/file.py'
-        os.environ[self.url_key] = LOCAL_FILE
-        self.assertEquals(CONTAINER_FILE, app.get_locust_file())
+    def test_multipe_python_files(self):
+        lt_script = '/'.join([self.github_link, self.file_name])
+        other_python_script = '/'.join([self.github_link, 'second.py'])
+        os.environ[self.file_input] = ','.join([lt_script, other_python_script])
+        with self.assertRaises(SystemExit) as exit_code:
+            app.get_files()
+        self.assertEqual(exit_code.exception.code, 1)
