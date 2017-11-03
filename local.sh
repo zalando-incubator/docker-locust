@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Based on https://stackoverflow.com/questions/20137838/catch-abort-signal-on-hudson-in-shell-script
+getAbort() {
+    echo "ABORT SIGNAL detected! Result won't be collected! terminating locust containers..."
+    docker-compose kill
+    echo y | docker-compose rm
+    echo "containers are terminated"
+}
+trap 'getAbort; exit' SIGINT SIGTERM
+
 function test() {
 cat <<EOF
 _________________________________________________________________________________
