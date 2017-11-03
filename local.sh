@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Based on https://stackoverflow.com/questions/20137838/catch-abort-signal-on-hudson-in-shell-script
-# For jenkins only
 getAbort() {
     echo "ABORT SIGNAL detected! Result won't be collected! terminating locust containers..."
     docker-compose kill
