@@ -148,7 +148,7 @@ EOF
     rm -rf reports
 
     echo "Deploy Locust application locally"
-    (export TARGET_HOST=$TARGET && export LOCUST_FILE=$LOCUST_FILE && export SLAVE_NUM=$SLAVES &&
+    (export IMAGE=$IMAGE && export TARGET_HOST=$TARGET && export LOCUST_FILE=$LOCUST_FILE && export SLAVE_NUM=$SLAVES &&
     export AUTOMATIC=$AUTOMATIC && export USERS=$USERS && export HATCH_RATE=$HATCH_RATE &&
     export DURATION=$DURATION && docker-compose up -d)
 
