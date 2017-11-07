@@ -16,8 +16,8 @@ ________________________________________________________________________________
                                      T E S T
 _________________________________________________________________________________
 EOF
-    IMAGE_NAME=docker_locust
-    CONTAINER_NAME=test_docker_locust
+    IMAGE_NAME=test_image_locust
+    CONTAINER_NAME=test_container_locust
 
     echo "Delete old reports"
     rm -f flake8.log
@@ -46,8 +46,6 @@ ________________________________________________________________________________
 EOF
 
     IMAGE="registry.opensource.zalan.do/tip/docker-locust"
-    echo "Used image: $IMAGE"
-
     echo "----------------------------------------------"       
     echo "             Download compose file            "     
     echo "----------------------------------------------"     
@@ -95,7 +93,6 @@ EOF
     echo "----------------------------------------------"
     echo "                   VARIABLES                  "
     echo "----------------------------------------------"
-    echo "DOCKER_IMAGE: $IMAGE"
     echo "TARGET_URL: $TARGET"
     echo "LOCUST_FILE: $LOCUST_FILE"
     echo "SLAVE NUMBER: $SLAVE"
@@ -115,9 +112,9 @@ EOF
     rm -rf reports
 
     echo "Deploy Locust application locally"
-    (export IMAGE=$IMAGE && export TARGET_HOST=$TARGET && export LOCUST_FILE=$LOCUST_FILE &&
-    export SLAVE_NUM=$SLAVE && export AUTOMATIC=$AUTOMATIC && export USERS=$USERS &&
-    export HATCH_RATE=$HATCH_RATE && export DURATION=$DURATION && docker-compose up -d)
+    (export TARGET_HOST=$TARGET && export LOCUST_FILE=$LOCUST_FILE && export SLAVE_NUM=$SLAVE &&
+    export AUTOMATIC=$AUTOMATIC && export USERS=$USERS && export HATCH_RATE=$HATCH_RATE &&
+    export DURATION=$DURATION && docker-compose up -d)
 
     echo "Locust application is successfully deployed. you can access http://<docker-host-ip-address>:8089"
 
