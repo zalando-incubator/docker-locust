@@ -9,6 +9,46 @@ getAbort() {
 }
 trap 'getAbort; exit' SIGINT SIGTERM
 
+function parse_args() {
+  CNT=1
+  for i in "$@"; do
+    case "${i}" in
+      --target=*)
+      TARGET="${i#*=}"
+      ;;
+      --locust_file=*)
+      LOCUST_FILE="${i#*=}"
+      ;;
+      --slaves=*)
+      SLAVES="${i#*=}"
+      ;;
+      --mode=*)
+      MODE="${i#*=}"
+      ;;
+      --users=*)
+      USERS="${i#*=}"
+      ;;
+      --hatch_rate=*)
+      HATCH_RATE="${i#*=}"
+      ;;
+      --duration=*)
+      DURATION="${i#*=}"
+      ;;
+      *)
+      ARG[${CNT}]="${i}"
+      CNT=$((CNT+1))
+      ;;
+    esac
+  done
+  [[ "${TARGET}" == "" ]] && [[ "${ARG[1]}" != "" ]] && TARGET="${ARG[1]}"
+  [[ "${LOCUST_FILE}" == "" ]] && [[ "${ARG[2]}" != "" ]] && LOCUST_FILE="${ARG[2]}"
+  [[ "${SLAVES}" == "" ]] && [[ "${ARG[3]}" != "" ]] && SLAVES="${ARG[3]}"
+  [[ "${MODE}" == "" ]] && [[ "${ARG[4]}" != "" ]] && MODE="${ARG[4]}"
+  [[ "${USERS}" == "" ]] && [[ "${ARG[5]}" != "" ]] && USERS="${ARG[5]}"
+  [[ "${HATCH_RATE}" == "" ]] && [[ "${ARG[6]}" != "" ]] && HATCH_RATE="${ARG[6]}"
+  [[ "${DURATION}" == "" ]] && [[ "${ARG[7]}" != "" ]] && DURATION="${ARG[7]}"
+}
+
 function test() {
 cat <<EOF
 _________________________________________________________________________________
@@ -44,6 +84,7 @@ ________________________________________________________________________________
                          L O C A L - D E P L O Y M E N T
 _________________________________________________________________________________
 EOF
+    parse_args $@
 
     IMAGE="registry.opensource.zalan.do/tip/docker-locust"
     echo "----------------------------------------------"       
@@ -57,34 +98,15 @@ EOF
         echo -e 'File is found, download is not needed! \xE2\x9C\x94'     
     fi
 
-    if [ -z "$1" ]; then
-        read -p "Target url: " TARGET
-    else
-        TARGET=$1
-    fi
+    [ -z "$TARGET" ] && read -p "Target url: " TARGET
+    [ -z "$LOCUST_FILE" ] && read -p "Where load test script is stored (e.g. https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py): " LOCUST_FILE
+    [ -z "$SLAVES" ] && read -p "Number of slave(s): " SLAVES
+    [ -z "$MODE" ] && read -p "Run type [automatic/manual]: " MODE
 
-    if [ -z "$2" ]; then
-        read -p "Where load test script is stored (e.g. https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py): " LOCUST_FILE
-    else
-        LOCUST_FILE=$2
-    fi
-
-    if [ -z "$3" ]; then
-        read -p "Number of slave(s): " SLAVE
-    else
-        SLAVE=$3
-    fi
-
-    if [ -z "$4" ]; then
-        read -p "Run type [automatic/manual]: " TYPE
-    else
-        TYPE=$4
-    fi
-
-    if [[ "$TYPE" =~ ^(automatic|Automatic|auto)$ ]]; then
-        read -p "Number of users [total users that will be simulated]: " USERS
-        read -p "Hatch rate [number of user will be added per second]: " HATCH_RATE
-        read -p "Duration [in seconds]: " DURATION
+    if [[ "$MODE" =~ ^(automatic|Automatic|auto)$ ]]; then
+        [ -z "$USERS" ] && read -p "Number of users [total users that will be simulated]: " USERS
+        [ -z "$HATCH_RATE" ] && read -p "Hatch rate [number of user will be added per second]: " HATCH_RATE
+        [ -z "$DURATION" ] && read -p "Duration [in seconds]: " DURATION
         AUTOMATIC=True
     else
         AUTOMATIC=False
@@ -95,8 +117,8 @@ EOF
     echo "----------------------------------------------"
     echo "TARGET_URL: $TARGET"
     echo "LOCUST_FILE: $LOCUST_FILE"
-    echo "SLAVE NUMBER: $SLAVE"
-    echo "RUN_TYPE: $TYPE || automatic=$AUTOMATIC"
+    echo "SLAVES NUMBER: $SLAVES"
+    echo "RUN_TYPE: $MODE || automatic=$AUTOMATIC"
     echo "NUMBER OF USERS: $USERS"
     echo "HATCH_RATE: $HATCH_RATE"
     echo "DURATION [in seconds]: $DURATION"
@@ -112,13 +134,13 @@ EOF
     rm -rf reports
 
     echo "Deploy Locust application locally"
-    (export TARGET_HOST=$TARGET && export LOCUST_FILE=$LOCUST_FILE && export SLAVE_NUM=$SLAVE &&
+    (export TARGET_HOST=$TARGET && export LOCUST_FILE=$LOCUST_FILE && export SLAVE_NUM=$SLAVES &&
     export AUTOMATIC=$AUTOMATIC && export USERS=$USERS && export HATCH_RATE=$HATCH_RATE &&
     export DURATION=$DURATION && docker-compose up -d)
 
     echo "Locust application is successfully deployed. you can access http://<docker-host-ip-address>:8089"
 
-    if [[ "$TYPE" =~ ^(automatic|Automatic|auto)$ ]]; then
+    if [[ "$MODE" =~ ^(automatic|Automatic|auto)$ ]]; then
         sleep 5
         sleep $DURATION
         docker cp docker_locusts_controller:/opt/reports .
