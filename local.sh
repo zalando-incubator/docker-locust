@@ -13,10 +13,10 @@ function print_help() {
 echo "Usage:
 ./local.sh deploy|test --target=<target_url> --locust_file=<file[,file2...]> --slaves=<slaves_amount> --mode=<manual|auto> [--users=<simultaneous_users> --hatch_rate=<added_users_per_second> --duration=<seconds>]
 E.g.:
-./local.sh deploy --target=https://google.com --locust_file=https://my.files.storage/file.py,https://my.files.storage/payload.json --slaves=4 --mode=manual
-./local.sh deploy --target=https://google.com --locust_file=./local_path.py --slaves=4 --mode=auto --users=1000 --hatch_rate=10 --duration=300
+./local.sh deploy --target=https://host-to-test.com --locust_file=https://my.storage/file.py,https://my.storage/payload.json --slaves=4 --mode=manual
+./local.sh deploy --target=https://host-to-test.com --locust_file=./local_path.py --slaves=4 --mode=auto --users=1000 --hatch_rate=10 --duration=300
 Using positional args:
-./local.sh deploy https://google.com ./local_path.py 4 auto 1000 10 300
+./local.sh deploy https://host-to-test.com ./local_path.py 4 auto 1000 10 300
 "
 }
 
