@@ -10,14 +10,17 @@ getAbort() {
 trap 'getAbort; exit' SIGINT SIGTERM
 
 function print_help() {
-echo "Usage:
+    echo "Usage:
 ./local.sh deploy|test --target=<target_url> --locust_file=<file[,file2...]> --slaves=<slaves_amount> --mode=<manual|auto> [--users=<simultaneous_users> --hatch_rate=<added_users_per_second> --duration=<seconds>]
+
 E.g.:
 ./local.sh deploy --target=https://host-to-test.com --locust_file=https://my.storage/file.py,https://my.storage/payload.json --slaves=4 --mode=manual
 ./local.sh deploy --target=https://host-to-test.com --locust_file=./local_path.py --slaves=4 --mode=auto --users=1000 --hatch_rate=10 --duration=300
+
 Using positional args:
 ./local.sh deploy https://host-to-test.com ./local_path.py 4 auto 1000 10 300
 "
+    exit 1
 }
 
 function parse_args() {
@@ -54,13 +57,14 @@ function parse_args() {
       ;;
     esac
   done
-  [[ "${TARGET}" == "" ]]      && [[ "${ARG[1]}" != "" ]] && TARGET="${ARG[1]}"
-  [[ "${LOCUST_FILE}" == "" ]] && [[ "${ARG[2]}" != "" ]] && LOCUST_FILE="${ARG[2]}"
-  [[ "${SLAVES}" == "" ]]      && [[ "${ARG[3]}" != "" ]] && SLAVES="${ARG[3]}"
-  [[ "${MODE}" == "" ]]        && [[ "${ARG[4]}" != "" ]] && MODE="${ARG[4]}"
-  [[ "${USERS}" == "" ]]       && [[ "${ARG[5]}" != "" ]] && USERS="${ARG[5]}"
-  [[ "${HATCH_RATE}" == "" ]]  && [[ "${ARG[6]}" != "" ]] && HATCH_RATE="${ARG[6]}"
-  [[ "${DURATION}" == "" ]]    && [[ "${ARG[7]}" != "" ]] && DURATION="${ARG[7]}"
+  [[ "${CMD}" == "" ]]         && [[ "${ARG[1]}" != "" ]] && CMD="${ARG[1]}"
+  [[ "${TARGET}" == "" ]]      && [[ "${ARG[2]}" != "" ]] && TARGET="${ARG[2]}"
+  [[ "${LOCUST_FILE}" == "" ]] && [[ "${ARG[3]}" != "" ]] && LOCUST_FILE="${ARG[3]}"
+  [[ "${SLAVES}" == "" ]]      && [[ "${ARG[4]}" != "" ]] && SLAVES="${ARG[4]}"
+  [[ "${MODE}" == "" ]]        && [[ "${ARG[5]}" != "" ]] && MODE="${ARG[5]}"
+  [[ "${USERS}" == "" ]]       && [[ "${ARG[6]}" != "" ]] && USERS="${ARG[6]}"
+  [[ "${HATCH_RATE}" == "" ]]  && [[ "${ARG[7]}" != "" ]] && HATCH_RATE="${ARG[7]}"
+  [[ "${DURATION}" == "" ]]    && [[ "${ARG[8]}" != "" ]] && DURATION="${ARG[8]}"
 }
 
 function test() {
@@ -98,8 +102,6 @@ ________________________________________________________________________________
                          L O C A L - D E P L O Y M E N T
 _________________________________________________________________________________
 EOF
-    parse_args $@
-
     IMAGE="registry.opensource.zalan.do/tip/docker-locust"
     echo "----------------------------------------------"       
     echo "             Download compose file            "     
@@ -161,6 +163,5 @@ EOF
     fi
 }
 
-[ ! -z "$1" ] && $@
-
-print_help
+parse_args $@
+[[ "${CMD}" != "" ]] && ${CMD} || print_help
