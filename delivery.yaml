@@ -8,10 +8,11 @@ build_steps:
       IS_PR_BUILD=${CDP_PULL_REQUEST_NUMBER+"true"}
       echo $IS_PR_BUILD
       if [[ ${IS_PR_BUILD} != "true" ]]; then
-        echo "Build image"
         GIT_TAG=$(git describe --tags --always --dirty)
-        IMAGE=registry-write.opensource.zalan.do/tip/docker-locust:${GIT_TAG}
-        docker build -t $IMAGE .
-        echo "Push image"
+        IMAGE=registry-write.opensource.zalan.do/tip/docker-locust:$GIT_TAG
+        echo "Image: $IMAGE"
+        echo "Build docker image"
+        docker build -t $IMAGE --build-arg DL_IMAGE_VERSION=$GIT_TAG .
+        echo "Push docker image"
         docker push $IMAGE
       fi
