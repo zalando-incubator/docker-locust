@@ -27,4 +27,5 @@ COPY setup.cfg /opt/
 WORKDIR /opt
 ENV PYTHONPATH .
 ARG DL_IMAGE_VERSION=latest
+ENV DL_IMAGE_VERSION=$DL_IMAGE_VERSION
 CMD ["/usr/bin/python", "src/app.py"]
