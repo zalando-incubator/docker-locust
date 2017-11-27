@@ -40,7 +40,7 @@ def bootstrap():
             target_host = get_or_raise('TARGET_HOST')
             locust_file = get_locust_file()
             master_host = get_or_raise('MASTER_HOST')
-            multiplier = int(os.getenv('SLAVE_MUL', (multiprocessing.cpu_count() * 2) + 1))
+            multiplier = int(os.getenv('SLAVE_MUL', multiprocessing.cpu_count()))
         except ValueError as verr:
             logger.error(verr)
 
