@@ -18,3 +18,5 @@ class SimpleBehavior(TaskSet):
 
 class MyLocust(HttpLocust):
     task_set = SimpleBehavior
+#    min_wait = 0
+#    max_wait = 0

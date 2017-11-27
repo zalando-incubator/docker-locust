@@ -15,14 +15,14 @@ logging.basicConfig()
 logger = logging.getLogger('bootstrap')
 
 
-def bootstrap():
+def bootstrap(role='', _return=0):
     """
     Initialize role of running docker container.
     master: web interface / API.
     slave: node that load test given url.
     controller: node that control the automatic run.
     """
-    role = get_or_raise('ROLE')
+    role = role if role else get_or_raise('ROLE')
     logger.info('Role :{role}'.format(role=role))
 
     if role == 'master':
@@ -40,7 +40,7 @@ def bootstrap():
             target_host = get_or_raise('TARGET_HOST')
             locust_file = get_locust_file()
             master_host = get_or_raise('MASTER_HOST')
-            multiplier = int(os.getenv('SLAVE_MUL', (multiprocessing.cpu_count() * 2) + 1))
+            multiplier = int(os.getenv('SLAVE_MUL', multiprocessing.cpu_count()))
         except ValueError as verr:
             logger.error(verr)
 
@@ -91,20 +91,30 @@ def bootstrap():
                             res = requests.get(url=master_url + '/htmlreport')
                             with open(os.path.join(report_path, 'reports.html'), "wb") as file:
                                 file.write(res.content)
-                            logger.info('Reports is successfully downloaded.')
+                            logger.info('Reports have been successfully downloaded.')
                         else:
                             logger.error('Locust cannot be started. Please check logs!')
 
                         break
                     else:
-                        logger.error('Attempt: {attempt}. Locust master might not ready yet. '
+                        logger.error('Attempt: {attempt}. Locust master might not ready yet.'
                                      'Status code: {status}'.format(attempt=_, status=res.status_code))
             except ValueError as v_err:
                 logger.error(v_err)
 
+    elif role == 'single':
+        automatic = convert_str_to_bool(os.getenv('AUTOMATIC', str(False)))
+        logger.info('Automatic run: {auto}'.format(auto=automatic))
+        bootstrap("master", 1)
+        bootstrap("slave", 1)
+        if automatic:
+          bootstrap("controller", 1)
+          sys.exit(0)
+
     else:
         raise RuntimeError('Invalid ROLE value. Valid Options: master, slave, controller.')
 
+    if _return: return
     for s in processes:
         s.communicate()
 
