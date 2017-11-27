@@ -102,10 +102,10 @@ def bootstrap(_return=0):
             except ValueError as v_err:
                 logger.error(v_err)
 
-    elif role == 'single':
+    elif role == 'local':
         automatic = convert_str_to_bool(os.getenv('AUTOMATIC', str(False)))
         logger.info('Automatic run: {auto}'.format(auto=automatic))
-        os.environ["MASTER_HOST"] = '127.0.0.1'
+        if not os.environ.get('MASTER_HOST'): os.environ["MASTER_HOST"] = '127.0.0.1'
         os.environ["ROLE"] = 'master'
         bootstrap(1)
         os.environ["ROLE"] = 'slave'
