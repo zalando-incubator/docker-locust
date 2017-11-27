@@ -15,14 +15,14 @@ logging.basicConfig()
 logger = logging.getLogger('bootstrap')
 
 
-def bootstrap(role='', _return=0):
+def bootstrap(_return=0):
     """
     Initialize role of running docker container.
     master: web interface / API.
     slave: node that load test given url.
     controller: node that control the automatic run.
     """
-    role = role if role else get_or_raise('ROLE')
+    role = get_or_raise('ROLE')
     logger.info('Role :{role}'.format(role=role))
 
     if role == 'master':
@@ -105,10 +105,14 @@ def bootstrap(role='', _return=0):
     elif role == 'single':
         automatic = convert_str_to_bool(os.getenv('AUTOMATIC', str(False)))
         logger.info('Automatic run: {auto}'.format(auto=automatic))
-        bootstrap("master", 1)
-        bootstrap("slave", 1)
+        os.environ["MASTER_HOST"] = '127.0.0.1'
+        os.environ["ROLE"] = 'master'
+        bootstrap(1)
+        os.environ["ROLE"] = 'slave'
+        bootstrap(1)
         if automatic:
-          bootstrap("controller", 1)
+          os.environ["ROLE"] = 'controller'
+          bootstrap(1)
           sys.exit(0)
 
     else:
