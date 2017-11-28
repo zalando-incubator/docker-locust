@@ -108,7 +108,7 @@ def bootstrap(_return=0):
     elif role == 'standalone':
       automatic = convert_str_to_bool(os.getenv('AUTOMATIC', str(False)))
       os.environ["MASTER_HOST"] = '127.0.0.1'
- 
+
       for role in ['master', 'slave', 'controller']:
         os.environ['ROLE'] = role
         bootstrap(1)
