@@ -176,7 +176,7 @@ def get_locust_file():
         else:
             logger.info('Load test script from local machine')
             if file.endswith('.py'):
-                file_name = '/'.join(['script', file])
+                file_name = file if file.startswith('/') else  '/'.join(['script', file])
     logger.info('load test file: {f}'.format(f=file_name))
     return file_name
 
