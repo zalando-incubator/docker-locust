@@ -104,13 +104,16 @@ def bootstrap(_return=0):
         except ValueError as v_err:
             logger.error(v_err)
 
-        sys.exit(0)
 
     elif role == 'standalone':
+      automatic = convert_str_to_bool(os.getenv('AUTOMATIC', str(False)))
       os.environ["MASTER_HOST"] = '127.0.0.1'
+ 
       for role in ['master', 'slave', 'controller']:
         os.environ['ROLE'] = role
         bootstrap(1)
+
+      if automatic: sys.exit(0)
 
     else:
         raise RuntimeError('Invalid ROLE value. Valid Options: master, slave, controller.')

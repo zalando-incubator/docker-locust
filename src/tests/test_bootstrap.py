@@ -50,14 +50,14 @@ class TestBootstrap(TestCase):
         os.environ['AUTOMATIC'] = '1'
 
         with mock.patch('src.app.get_locust_file') as file:
-          bootstrap()
-          self.assertTrue(mocked_popen.called)
+            bootstrap()
+            self.assertTrue(mocked_popen.called)
 
         os.environ['AUTOMATIC'] = '0'
         with mock.patch('src.app.get_locust_file') as file:
-          bootstrap()
-          self.assertTrue(mocked_popen.called)
-          self.assertTrue(mocked_exit.called)
+            bootstrap()
+            self.assertTrue(mocked_popen.called)
+            self.assertTrue(mocked_exit.called)
 
     @mock.patch('time.sleep')
     @mock.patch('os.makedirs')
