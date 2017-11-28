@@ -58,67 +58,65 @@ def bootstrap(_return=0):
         automatic = convert_str_to_bool(os.getenv('AUTOMATIC', str(False)))
         logger.info('Automatic run: {auto}'.format(auto=automatic))
 
-        if automatic:
-            try:
-                master_host = get_or_raise('MASTER_HOST')
-                master_url = 'http://{master}:8089'.format(master=master_host)
-                users = int(get_or_raise('USERS'))
-                hatch_rate = int(get_or_raise('HATCH_RATE'))
-                duration = int(get_or_raise('DURATION'))
-                logger.info(
-                    'master url: {url}, users: {users}, hatch_rate: {rate}, duration: {duration}'.format(
-                        url=master_url, users=users, rate=hatch_rate, duration=duration))
+        if not automatic:
+          return
 
-                for _ in range(0, 5):
-                    import time
-                    time.sleep(3)
+        try:
+            master_host = get_or_raise('MASTER_HOST')
+            master_url = 'http://{master}:8089'.format(master=master_host)
+            users = int(get_or_raise('USERS'))
+            hatch_rate = int(get_or_raise('HATCH_RATE'))
+            duration = int(get_or_raise('DURATION'))
+            logger.info(
+                'master url: {url}, users: {users}, hatch_rate: {rate}, duration: {duration}'.format(
+                    url=master_url, users=users, rate=hatch_rate, duration=duration))
 
-                    res = requests.get(url=master_url)
+            for _ in range(0, 5):
+                import time
+                time.sleep(3)
+
+                res = requests.get(url=master_url)
+                if res.ok:
+                    logger.info('Start load test automatically for {duration} seconds.'.format(duration=duration))
+                    payload = {'locust_count': users, 'hatch_rate': hatch_rate}
+                    res = requests.post(url=master_url + '/swarm', data=payload)
+
                     if res.ok:
-                        logger.info('Start load test automatically for {duration} seconds.'.format(duration=duration))
-                        payload = {'locust_count': users, 'hatch_rate': hatch_rate}
-                        res = requests.post(url=master_url + '/swarm', data=payload)
+                        time.sleep(duration)
+                        requests.get(url=master_url + '/stop')
+                        logger.info('Load test is stopped.')
 
-                        if res.ok:
-                            time.sleep(duration)
-                            requests.get(url=master_url + '/stop')
-                            logger.info('Load test is stopped.')
+                        logger.info('Downloading reports...')
+                        report_path = os.path.join(os.getcwd(), 'reports')
+                        os.makedirs(report_path)
 
-                            logger.info('Downloading reports...')
-                            report_path = os.path.join(os.getcwd(), 'reports')
-                            os.makedirs(report_path)
-
-                            res = requests.get(url=master_url + '/htmlreport')
-                            with open(os.path.join(report_path, 'reports.html'), "wb") as file:
-                                file.write(res.content)
-                            logger.info('Reports have been successfully downloaded.')
-                        else:
-                            logger.error('Locust cannot be started. Please check logs!')
-
-                        break
+                        res = requests.get(url=master_url + '/htmlreport')
+                        with open(os.path.join(report_path, 'reports.html'), "wb") as file:
+                            file.write(res.content)
+                        logger.info('Reports have been successfully downloaded.')
                     else:
-                        logger.error('Attempt: {attempt}. Locust master might not ready yet.'
-                                     'Status code: {status}'.format(attempt=_, status=res.status_code))
-            except ValueError as v_err:
-                logger.error(v_err)
+                        logger.error('Locust cannot be started. Please check logs!')
 
-    elif role == 'local':
-        automatic = convert_str_to_bool(os.getenv('AUTOMATIC', str(False)))
-        logger.info('Automatic run: {auto}'.format(auto=automatic))
-        if not os.environ.get('MASTER_HOST'): os.environ["MASTER_HOST"] = '127.0.0.1'
-        os.environ["ROLE"] = 'master'
+                    break
+                else:
+                    logger.error('Attempt: {attempt}. Locust master might not ready yet.'
+                                 'Status code: {status}'.format(attempt=_, status=res.status_code))
+        except ValueError as v_err:
+            logger.error(v_err)
+
+        sys.exit(0)
+
+    elif role == 'standalone':
+      os.environ["MASTER_HOST"] = '127.0.0.1'
+      for role in ['master', 'slave', 'controller']:
+        os.environ['ROLE'] = role
         bootstrap(1)
-        os.environ["ROLE"] = 'slave'
-        bootstrap(1)
-        if automatic:
-          os.environ["ROLE"] = 'controller'
-          bootstrap(1)
-          sys.exit(0)
 
     else:
         raise RuntimeError('Invalid ROLE value. Valid Options: master, slave, controller.')
 
     if _return: return
+
     for s in processes:
         s.communicate()
 
