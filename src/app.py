@@ -4,11 +4,12 @@ import logging
 
 import multiprocessing
 import os
+import requests
 import signal
 import subprocess
 import sys
 
-import requests
+from src import report
 
 processes = []
 logging.basicConfig()
@@ -31,7 +32,7 @@ def bootstrap(_return=0):
         logger.info('target host: {target}, locust file: {file}'.format(target=target_host, file=locust_file))
 
         s = subprocess.Popen([
-            'locust', '-H', target_host, '--loglevel', 'debug', '--master', '-f', locust_file
+            'locust', '-H', target_host, '--loglevel', 'debug', '--master', '--no-reset-stats', '-f', locust_file
         ])
         processes.append(s)
 
@@ -49,7 +50,7 @@ def bootstrap(_return=0):
         for _ in range(multiplier):
             logger.info('Started Process')
             s = subprocess.Popen([
-                'locust', '-H', target_host, '--loglevel', 'debug', '--slave', '-f', locust_file,
+                'locust', '-H', target_host, '--loglevel', 'debug', '--no-reset-stats', '--slave', '-f', locust_file,
                 '--master-host', master_host
             ])
             processes.append(s)
@@ -87,13 +88,22 @@ def bootstrap(_return=0):
                         logger.info('Load test is stopped.')
 
                         logger.info('Downloading reports...')
+                        time.sleep(5)
                         report_path = os.path.join(os.getcwd(), 'reports')
                         os.makedirs(report_path)
 
-                        res = requests.get(url=master_url + '/htmlreport')
-                        with open(os.path.join(report_path, 'reports.html'), "wb") as file:
+                        for _url in ['requests', 'distribution']: 
+                          res = requests.get(url=master_url + '/stats/' + _url)
+                          with open(os.path.join(report_path, _url + '.json'), "wb") as file:
                             file.write(res.content)
+
+                          res = requests.get(url=master_url + '/stats/' + _url + '/csv')
+                          with open(os.path.join(report_path, _url + '.csv'), "wb") as file:
+                            file.write(res.content)
+
                         logger.info('Reports have been successfully downloaded.')
+
+                        report.generate_report()
                     else:
                         logger.error('Locust cannot be started. Please check logs!')
 

@@ -1,50 +1,37 @@
 import csv
 import datetime
+import json
 import logging
 import os
 
-from flask import make_response
-
 from jinja2 import Environment, FileSystemLoader
 
-import requests
-
+HTML_TEMPLATE = 'report-template.html'
+HTML_REPORT = 'reports/reports.html'
+DISTRIBUTION_CSV = 'reports/distribution.csv'
+REQUESTS_JSON = 'reports/requests.json'
 
 WORK_DIR = os.path.dirname(__file__)
-CSV_URL = 'http://0.0.0.0:8089/stats/distribution/csv'
-STAT_URL = 'http://0.0.0.0:8089/stats/requests'
-
-HTML_TEMPLATE = 'report-template.html'
-HTML_REPORT = 'report.html'
 
 logger = logging.getLogger('reporting')
 
-
-def generate_report(distribution_csv, template_file, report_file):
+def generate_report():
     """
     Generate load test result in a format based on the given template and save it into a given report file.
 
-    :param distribution_csv: distribution file name.
-    :type distribution_csv: str
-    :param template_file: template name.
-    :type template_file: str
-    :param report_file: report file name.
-    :type report_file: str
-
     """
-    with open(distribution_csv, 'r') as dc:
+
+    with open(DISTRIBUTION_CSV, 'r') as dc:
         content = csv.reader(dc)
         distribution = [','.join(t) for t in content]
 
         j2_env = Environment(loader=FileSystemLoader(WORK_DIR), trim_blocks=True)
 
-        res = requests.get(url=STAT_URL)
-        logger.info('request code for {url} is {status}'.format(url=STAT_URL, status=res.status_code))
-        if res.ok:
-            json_res = res.json()
+        with open(REQUESTS_JSON, 'r') as requests:
+            json_res = json.load(requests)
             logger.info('json response : {res}'.format(res=json_res))
 
-            with open(report_file, 'w') as rf:
+            with open(HTML_REPORT, 'w') as rf:
                 s_methods, s_names, s_num_req, s_failures, s_median,  s_avg, s_min, s_max, s_length, s_rps =  \
                     ([] for _ in range(10))
 
@@ -69,7 +56,7 @@ def generate_report(distribution_csv, template_file, report_file):
                         e_occurences.append(error['occurences'])
                         e_description.append(error['error'])
 
-                rf.write(j2_env.get_template(template_file).render(
+                rf.write(j2_env.get_template(HTML_TEMPLATE).render(
                     datetime=datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
                     slaves=round(float(json_res.get('slave_count')), 1),
                     rps=round(float(json_res.get('total_rps')), 1),
@@ -79,27 +66,3 @@ def generate_report(distribution_csv, template_file, report_file):
                     stat_min_res=s_min, stat_max_res=s_max, stat_content_length=s_length, stat_rps=s_rps,
                     error_method=e_method, error_name=e_name, error_occur=e_occurences, error_description=e_description,
                     distribution_header=distribution[0], distribution_content=distribution[1:]))
-
-
-def download_report():
-    """
-    Download report.
-
-    :return: load test report in html format.
-
-    """
-    res = requests.get(url=CSV_URL)
-    logger.info('request code for {url} is {status}'.format(url=CSV_URL, status=res.status_code))
-
-    if res.ok:
-        distribution_file = 'distribution.csv'
-        with open(distribution_file, 'wb') as dis_file:
-            dis_file.write(res.text)
-
-        generate_report(distribution_file, HTML_TEMPLATE, HTML_REPORT)
-
-        if os.path.isfile(HTML_REPORT):
-            headers = {'Content-Disposition': 'attachment; filename={name}'.format(name=HTML_REPORT)}
-            with open(HTML_REPORT, 'r') as rf:
-                html_report = rf.read()
-            return make_response(html_report, headers) if html_report else None
