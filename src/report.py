@@ -7,31 +7,28 @@ import os
 from jinja2 import Environment, FileSystemLoader
 
 HTML_TEMPLATE = 'report-template.html'
-HTML_REPORT = 'reports/reports.html'
-DISTRIBUTION_CSV = 'reports/distribution.csv'
-REQUESTS_JSON = 'reports/requests.json'
 
 WORK_DIR = os.path.dirname(__file__)
 
 logger = logging.getLogger('reporting')
 
-def generate_report():
+def generate_report(distribution_csv = 'reports/distribution.csv', requests_json = 'reports/requests.json', html_report = 'reports/reports.html'):
     """
     Generate load test result in a format based on the given template and save it into a given report file.
 
     """
 
-    with open(DISTRIBUTION_CSV, 'r') as dc:
+    with open(distribution_csv, 'r') as dc:
         content = csv.reader(dc)
         distribution = [','.join(t) for t in content]
 
         j2_env = Environment(loader=FileSystemLoader(WORK_DIR), trim_blocks=True)
 
-        with open(REQUESTS_JSON, 'r') as requests:
-            json_res = json.load(requests)
+        with open(requests_json, 'r') as req:
+            json_res = json.load(req)
             logger.info('json response : {res}'.format(res=json_res))
 
-            with open(HTML_REPORT, 'w') as rf:
+            with open(html_report, 'w') as rf:
                 s_methods, s_names, s_num_req, s_failures, s_median,  s_avg, s_min, s_max, s_length, s_rps =  \
                     ([] for _ in range(10))
 
