@@ -109,11 +109,14 @@ def bootstrap(_return=0):
       automatic = convert_str_to_bool(os.getenv('AUTOMATIC', str(False)))
       os.environ["MASTER_HOST"] = '127.0.0.1'
 
-      for role in ['master', 'slave', 'controller']:
+      for role in ['master', 'slave']:
         os.environ['ROLE'] = role
         bootstrap(1)
 
-      if automatic: sys.exit(0)
+      if automatic:
+        os.environ['ROLE'] = 'controller'
+        bootstrap(1)
+        sys.exit(0)
 
     else:
         raise RuntimeError('Invalid ROLE value. Valid Options: master, slave, controller.')
