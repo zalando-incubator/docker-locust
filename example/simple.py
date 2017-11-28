@@ -1,7 +1,6 @@
 from locust import HttpLocust
 from locust import TaskSet
 from locust import task
-from locust.web import app
 
 
 class SimpleBehavior(TaskSet):

@@ -5,7 +5,6 @@ from random import randint
 from locust import HttpLocust
 from locust import TaskSet
 from locust import task
-from locust.web import app
 
 # Read json file
 json_file = os.path.join(os.path.dirname(__file__), 'payloads.json')

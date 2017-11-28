@@ -92,7 +92,7 @@ def bootstrap(_return=0):
                         report_path = os.path.join(os.getcwd(), 'reports')
                         os.makedirs(report_path)
 
-                        for _url in ['requests', 'distribution']: 
+                        for _url in ['requests', 'distribution']:
                           res = requests.get(url=master_url + '/stats/' + _url)
                           with open(os.path.join(report_path, _url + '.json'), "wb") as file:
                             file.write(res.content)
