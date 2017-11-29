@@ -87,7 +87,7 @@ def bootstrap(_return=0):
                         logger.info('Load test is stopped.')
 
                         logger.info('Downloading reports...')
-                        time.sleep(5)
+                        time.sleep(4)
                         report_path = os.path.join(os.getcwd(), 'reports')
                         os.makedirs(report_path)
 
