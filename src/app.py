@@ -31,7 +31,7 @@ def bootstrap(_return=0):
         logger.info('target host: {target}, locust file: {file}'.format(target=target_host, file=locust_file))
 
         s = subprocess.Popen([
-            'locust', '-H', target_host, '--loglevel', 'debug', '--master', '--no-reset-stats', '-f', locust_file
+            'locust', '-H', target_host, '--loglevel', 'debug', '--master', '-f', locust_file
         ])
         processes.append(s)
 
@@ -49,7 +49,7 @@ def bootstrap(_return=0):
         for _ in range(multiplier):
             logger.info('Started Process')
             s = subprocess.Popen([
-                'locust', '-H', target_host, '--loglevel', 'debug', '--slave', '--no-reset-stats', '-f', locust_file,
+                'locust', '-H', target_host, '--loglevel', 'debug', '--slave', '-f', locust_file,
                 '--master-host', master_host
             ])
             processes.append(s)
@@ -92,13 +92,13 @@ def bootstrap(_return=0):
                         os.makedirs(report_path)
 
                         for _url in ['requests', 'distribution']:
-                          res = requests.get(url=master_url + '/stats/' + _url)
-                          with open(os.path.join(report_path, _url + '.json'), "wb") as file:
-                            file.write(res.content)
+                            res = requests.get(url=master_url + '/stats/' + _url)
+                            with open(os.path.join(report_path, _url + '.json'), "wb") as file:
+                                file.write(res.content)
 
-                          res = requests.get(url=master_url + '/stats/' + _url + '/csv')
-                          with open(os.path.join(report_path, _url + '.csv'), "wb") as file:
-                            file.write(res.content)
+                            res = requests.get(url=master_url + '/stats/' + _url + '/csv')
+                            with open(os.path.join(report_path, _url + '.csv'), "wb") as file:
+                                file.write(res.content)
 
                         res = requests.get(url=master_url + '/htmlreport')
                         with open(os.path.join(report_path, 'reports.html'), "wb") as file:
@@ -116,22 +116,23 @@ def bootstrap(_return=0):
 
 
     elif role == 'standalone':
-      automatic = convert_str_to_bool(os.getenv('AUTOMATIC', str(False)))
-      os.environ["MASTER_HOST"] = '127.0.0.1'
+        automatic = convert_str_to_bool(os.getenv('AUTOMATIC', str(False)))
+        os.environ["MASTER_HOST"] = '127.0.0.1'
 
-      for role in ['master', 'slave']:
-        os.environ['ROLE'] = role
-        bootstrap(1)
+        for role in ['master', 'slave']:
+            os.environ['ROLE'] = role
+            bootstrap(1)
 
-      if automatic:
-        os.environ['ROLE'] = 'controller'
-        bootstrap(1)
-        sys.exit(0)
+        if automatic:
+            os.environ['ROLE'] = 'controller'
+            bootstrap(1)
+            sys.exit(0)
 
     else:
         raise RuntimeError('Invalid ROLE value. Valid Options: master, slave, controller.')
 
-    if _return: return
+    if _return:
+        return
 
     for s in processes:
         s.communicate()
