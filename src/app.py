@@ -9,7 +9,6 @@ import signal
 import subprocess
 import sys
 
-from src import report
 
 processes = []
 logging.basicConfig()
@@ -50,7 +49,7 @@ def bootstrap(_return=0):
         for _ in range(multiplier):
             logger.info('Started Process')
             s = subprocess.Popen([
-                'locust', '-H', target_host, '--loglevel', 'debug', '--no-reset-stats', '--slave', '-f', locust_file,
+                'locust', '-H', target_host, '--loglevel', 'debug', '--slave', '--no-reset-stats', '-f', locust_file,
                 '--master-host', master_host
             ])
             processes.append(s)
@@ -101,9 +100,10 @@ def bootstrap(_return=0):
                           with open(os.path.join(report_path, _url + '.csv'), "wb") as file:
                             file.write(res.content)
 
+                        res = requests.get(url=master_url + '/htmlreport')
+                        with open(os.path.join(report_path, 'reports.html'), "wb") as file:
+                            file.write(res.content)
                         logger.info('Reports have been successfully downloaded.')
-
-                        report.generate_report()
                     else:
                         logger.error('Locust cannot be started. Please check logs!')
 

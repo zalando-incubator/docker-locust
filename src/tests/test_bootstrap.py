@@ -79,16 +79,16 @@ class TestBootstrap(TestCase):
         mocked_request.get(url='http://127.0.0.1:8089/stats/requests/csv', text='ok')
         mocked_request.get(url='http://127.0.0.1:8089/stats/distribution', text='ok')
         mocked_request.get(url='http://127.0.0.1:8089/stats/distribution/csv', text='ok')
+        mocked_request.get(url='http://127.0.0.1:8089/htmlreport', text='ok')
         self.assertFalse(mocked_timeout.called)
         self.assertFalse(mocked_request.called)
         self.assertFalse(mocked_dir.called)
         self.assertFalse(mocked_open.called)
-        # technical debt
-        #bootstrap()
-        #self.assertTrue(mocked_timeout.called)
-        #self.assertTrue(mocked_request.called)
-        #self.assertTrue(mocked_dir.called)
-        #self.assertTrue(mocked_open.called)
+        bootstrap()
+        self.assertTrue(mocked_timeout.called)
+        self.assertTrue(mocked_request.called)
+        self.assertTrue(mocked_dir.called)
+        self.assertTrue(mocked_open.called)
 
     def test_invalid_role(self):
         os.environ['ROLE'] = 'unknown'
