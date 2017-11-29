@@ -157,7 +157,7 @@ EOF
     echo "Locust application is successfully deployed. you can access http://<docker-host-ip-address>:8089"
 
     if [[ "$MODE" =~ ^(automatic|Automatic|auto)$ ]]; then
-        sleep 5
+        sleep 8
         sleep $DURATION
         docker cp docker_locusts_controller:/opt/reports .
     fi
