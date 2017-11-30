@@ -96,7 +96,7 @@ def bootstrap(_return=0):
                             with open(os.path.join(report_path, _url + '.csv'), "wb") as file:
                                 file.write(res.content)
 
-                            if _url == "distriution": continue
+                            if _url == 'distribution': continue
                             res = requests.get(url=master_url + '/stats/' + _url)
                             with open(os.path.join(report_path, _url + '.json'), "wb") as file:
                                 file.write(res.content)
