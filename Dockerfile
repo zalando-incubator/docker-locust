@@ -4,7 +4,7 @@ FROM registry.opensource.zalan.do/stups/ubuntu:16.04.3-10
 # General Configuration
 #=======================
 ENV REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
-RUN apt-get update && apt-get install -y python-dev python-zmq python-pip && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y bc jq python-dev python-zmq python-pip && rm -rf /var/lib/apt/lists/*
 
 #==============
 # Expose Ports
