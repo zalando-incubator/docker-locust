@@ -92,12 +92,13 @@ def bootstrap(_return=0):
                         os.makedirs(report_path)
 
                         for _url in ['requests', 'distribution']:
-                            res = requests.get(url=master_url + '/stats/' + _url)
-                            with open(os.path.join(report_path, _url + '.json'), "wb") as file:
-                                file.write(res.content)
-
                             res = requests.get(url=master_url + '/stats/' + _url + '/csv')
                             with open(os.path.join(report_path, _url + '.csv'), "wb") as file:
+                                file.write(res.content)
+
+                            if _url == "distriution": continue
+                            res = requests.get(url=master_url + '/stats/' + _url)
+                            with open(os.path.join(report_path, _url + '.json'), "wb") as file:
                                 file.write(res.content)
 
                         res = requests.get(url=master_url + '/htmlreport')
