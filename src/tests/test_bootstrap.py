@@ -77,7 +77,6 @@ class TestBootstrap(TestCase):
         mocked_request.get(url='http://127.0.0.1:8089/stop', text='ok')
         mocked_request.get(url='http://127.0.0.1:8089/stats/requests', text='ok')
         mocked_request.get(url='http://127.0.0.1:8089/stats/requests/csv', text='ok')
-        mocked_request.get(url='http://127.0.0.1:8089/stats/distribution', text='ok')
         mocked_request.get(url='http://127.0.0.1:8089/stats/distribution/csv', text='ok')
         mocked_request.get(url='http://127.0.0.1:8089/htmlreport', text='ok')
         self.assertFalse(mocked_timeout.called)
