@@ -13,7 +13,6 @@ Key advantages
 1. It allows users to upload load test scenario/script from different resources (any HTTP/HTTPS URL, S3 bucket, and local machine).
 2. It has the ability to be run in any CI tool e.g. Jenkins (It can start/stop load test automatically) and provides an HTML report at the end of a load test.
 3. It is also possible to be deployed in AWS to create bigger load.
-4. Open source with more useful features coming.
 
 Requirements
 ------------
@@ -44,13 +43,13 @@ Run type [automatic/manual]: manual
 bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py 4 manual
 ```
 
-OR you can also use your own load test script that is stored in **AWS S3**. e.g:
+Sample command to read load test script from S3 bucket:
 
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com s3://mybucket/mypath/myscript.py 4 manual
 ```
 
-OR load test script that is stored in **your local machine** in your current / work directory. e.g.:
+Sample command to read load test script from local machine:
 
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com myfolder/myscript.py 4 manual
@@ -62,6 +61,29 @@ docker-locust has the ability to read multiple files from s3 or any http/https, 
 
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple_post.py,https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/payloads.json 4 manual
+```
+
+Run as standalone version
+-------------------------
+
+docker-locust can be also run as **standalone version**, which required only 1 single docker container.
+
+Sample command to read load test script from any http/https url:
+
+```bash
+docker run -i -p 8089:8089 -e TARGET_HOST=https://targeturl.com -e LOCUST_FILE=https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py -e ROLE=standalone -e AUTOMATIC=True -e DURATION=10 -e HATCH_RATE=1 -e USERS=5 registry.opensource.zalan.do/tip/docker-locust
+```
+
+Sample command to read load test script from S3 bucket:
+
+```bash
+docker run -i -v ~/.aws:/root/.aws -p 8089:8089 -e TARGET_HOST=https://targeturl.com -e LOCUST_FILE=s3://mybucket/mypath/myscript.py -e ROLE=standalone -e AUTOMATIC=True -e DURATION=10 -e HATCH_RATE=1 -e USERS=5 registry.opensource.zalan.do/tip/docker-locust
+```
+
+Sample command to read load test script from local machine:
+
+```bash
+docker run -i -v $PWD/example:/opt/script -p 8089:8089 -e TARGET_HOST=https://targeturl.com -e LOCUST_FILE=simple.py -e ROLE=standalone -e AUTOMATIC=True -e DURATION=10 -e HATCH_RATE=1 -e USERS=5 registry.opensource.zalan.do/tip/docker-locust
 ```
 
 Report Generation
