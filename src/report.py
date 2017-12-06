@@ -87,7 +87,8 @@ def download_report():
     :return: load test report in html format.
 
     """
-    if os.getenv('ROLE') != 'master': return
+    if os.getenv('ROLE') != 'master':
+        return
 
     res = requests.get(url=CSV_URL)
     logger.info('request code for {url} is {status}'.format(url=CSV_URL, status=res.status_code))

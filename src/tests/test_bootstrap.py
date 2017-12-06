@@ -6,7 +6,7 @@ import mock
 
 import requests_mock
 
-from src.app import bootstrap
+from src.wrapper import bootstrap
 
 
 class TestBootstrap(TestCase):
@@ -51,13 +51,13 @@ class TestBootstrap(TestCase):
         os.environ['LOC'] = '1'
 
         with mock.patch('src.app.get_locust_file'):
-          bootstrap()
-          self.assertTrue(mocked_popen.called)
+            bootstrap()
+            self.assertTrue(mocked_popen.called)
 
-          os.environ['AUTOMATIC'] = '0'
-          bootstrap()
-          self.assertTrue(mocked_popen.called)
-          self.assertTrue(mocked_exit.called)
+            os.environ['AUTOMATIC'] = '0'
+            bootstrap()
+            self.assertTrue(mocked_popen.called)
+            self.assertTrue(mocked_exit.called)
 
     @mock.patch('time.sleep')
     @mock.patch('os.makedirs')

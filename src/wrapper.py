@@ -59,7 +59,7 @@ def bootstrap(_return=0):
         logger.info('Automatic run: {auto}'.format(auto=automatic))
 
         if not automatic:
-          return
+            return
 
         try:
             master_host = get_or_raise('MASTER_HOST')
@@ -96,7 +96,8 @@ def bootstrap(_return=0):
                             with open(os.path.join(report_path, _url + '.csv'), "wb") as file:
                                 file.write(res.content)
 
-                            if _url == 'distribution': continue
+                            if _url == 'distribution':
+                                continue
                             res = requests.get(url=master_url + '/stats/' + _url)
                             with open(os.path.join(report_path, _url + '.json'), "wb") as file:
                                 file.write(res.content)
@@ -114,7 +115,6 @@ def bootstrap(_return=0):
                                  'Status code: {status}'.format(attempt=_, status=res.status_code))
         except ValueError as v_err:
             logger.error(v_err)
-
 
     elif role == 'standalone':
         automatic = convert_str_to_bool(os.getenv('AUTOMATIC', str(False)))
@@ -188,7 +188,7 @@ def get_locust_file():
         else:
             logger.info('Load test script from local machine')
             if file.endswith('.py'):
-                file_name = file if file.startswith('/') else  '/'.join(['script', file])
+                file_name = file if file.startswith('/') else '/'.join(['script', file])
     logger.info('load test file: {f}'.format(f=file_name))
     return file_name
 
