@@ -1,14 +1,16 @@
 #!/usr/bin/env python2
 
+import errno
 import logging
 
 import multiprocessing
 import os
-import requests
+
 import signal
 import subprocess
 import sys
 
+import requests
 
 processes = []
 logging.basicConfig()
@@ -86,11 +88,17 @@ def bootstrap(_return=0):
                         requests.get(url=master_url + '/stop')
                         logger.info('Load test is stopped.')
 
-                        logger.info('Downloading reports...')
                         time.sleep(4)
-                        report_path = os.path.join(os.getcwd(), 'reports')
-                        os.makedirs(report_path)
 
+                        logging.info('Creating report folder.')
+                        report_path = os.path.join(os.getcwd(), 'reports')
+                        try:
+                            os.makedirs(report_path)
+                        except OSError as e:
+                            if e.errno != errno.EEXIST:
+                                raise
+
+                        logger.info('Creating reports...')
                         for _url in ['requests', 'distribution']:
                             res = requests.get(url=master_url + '/stats/' + _url + '/csv')
                             with open(os.path.join(report_path, _url + '.csv'), "wb") as file:
@@ -105,7 +113,7 @@ def bootstrap(_return=0):
                         res = requests.get(url=master_url + '/htmlreport')
                         with open(os.path.join(report_path, 'reports.html'), "wb") as file:
                             file.write(res.content)
-                        logger.info('Reports have been successfully downloaded.')
+                        logger.info('Reports have been successfully created.')
                     else:
                         logger.error('Locust cannot be started. Please check logs!')
 
