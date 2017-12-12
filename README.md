@@ -73,7 +73,7 @@ docker-locust can be run in multiple docker-containers. It is useful for users w
 Run the application with the command:
 
 ```bash
-MULTI_CONTAINERS=true bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy
+DOCKER_COMPOSE=true bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy
 ```
 
 Read multiple files

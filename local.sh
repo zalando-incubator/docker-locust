@@ -118,9 +118,9 @@ EOF
         AUTOMATIC=false
     fi
 
-    STANDALONE=true
-    if [[ "$MULTI_CONTAINERS" =~ ^(True|true|T|t|1)$ ]]; then
-        STANDALONE=false
+    COMPOSE=false
+    if [[ "$DOCKER_COMPOSE" =~ ^(True|true|T|t|1)$ ]]; then
+        COMPOSE=true
     fi
 
     echo "----------------------------------------------"
@@ -133,16 +133,11 @@ EOF
     echo "NUMBER OF USERS: $USERS"
     echo "HATCH_RATE: $HATCH_RATE"
     echo "DURATION [in seconds]: $DURATION"
-    echo "STANDALONE: $STANDALONE"
+    echo "COMPOSE: $COMPOSE"
     echo "----------------------------------------------"
 
-    if $STANDALONE; then
-        echo "Run in standalone mode"
-        docker run -i --rm -v $PWD/reports:/opt/reports -p 8089:8089 -e ROLE=standalone -e TARGET_HOST=$TARGET \
-        -e LOCUST_FILE=$LOCUST_FILE -e SLAVE_MUL=$SLAVES -e AUTOMATIC=$AUTOMATIC -e USERS=$USERS \
-        -e HATCH_RATE=$HATCH_RATE -e DURATION=$DURATION $IMAGE
-    else
-        echo "Run in normal mode"
+    if $COMPOSE; then
+        echo "Run with docker-compose"
         echo "----------------------------------------------"
         echo "             Download compose file            "
         echo "----------------------------------------------"
@@ -175,6 +170,11 @@ EOF
             sleep $DURATION
             docker cp docker_locusts_controller:/opt/reports .
         fi
+    else
+        echo "Run in standalone mode"
+        docker run -i --rm -v $PWD/reports:/opt/reports -p 8089:8089 -e ROLE=standalone -e TARGET_HOST=$TARGET \
+        -e LOCUST_FILE=$LOCUST_FILE -e SLAVE_MUL=$SLAVES -e AUTOMATIC=$AUTOMATIC -e USERS=$USERS \
+        -e HATCH_RATE=$HATCH_RATE -e DURATION=$DURATION $IMAGE
     fi
 }
 
