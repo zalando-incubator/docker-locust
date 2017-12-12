@@ -113,14 +113,13 @@ EOF
         [ -z "$USERS" ] && read -p "Number of users [total users that will be simulated]: " USERS
         [ -z "$HATCH_RATE" ] && read -p "Hatch rate [number of user will be added per second]: " HATCH_RATE
         [ -z "$DURATION" ] && read -p "Duration [in seconds]: " DURATION
-        AUTOMATIC=True
+        AUTOMATIC=true
     else
-        AUTOMATIC=False
+        AUTOMATIC=false
     fi
 
-    if [[ "$STANDALONE" =~ ^(True|true|T|t|1)$ ]]; then
-        STANDALONE=true
-    else
+    STANDALONE=true
+    if [[ "$MULTI_CONTAINERS" =~ ^(True|true|T|t|1)$ ]]; then
         STANDALONE=false
     fi
 
@@ -139,7 +138,7 @@ EOF
 
     if $STANDALONE; then
         echo "Run in standalone mode"
-        docker run -i -v $PWD/reports:/opt/reports -p 8089:8089 -e ROLE=standalone -e TARGET_HOST=$TARGET \
+        docker run -i --rm -v $PWD/reports:/opt/reports -p 8089:8089 -e ROLE=standalone -e TARGET_HOST=$TARGET \
         -e LOCUST_FILE=$LOCUST_FILE -e SLAVE_MUL=$SLAVES -e AUTOMATIC=$AUTOMATIC -e USERS=$USERS \
         -e HATCH_RATE=$HATCH_RATE -e DURATION=$DURATION $IMAGE
     else
@@ -171,7 +170,7 @@ EOF
 
         echo "Locust application is successfully deployed. you can access http://<docker-host-ip-address>:8089"
 
-        if [[ "$MODE" =~ ^(automatic|Automatic|auto)$ ]]; then
+        if $AUTOMATIC; then
             sleep 8
             sleep $DURATION
             docker cp docker_locusts_controller:/opt/reports .

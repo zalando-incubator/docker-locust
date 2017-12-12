@@ -38,10 +38,10 @@ Getting Started
 ### Single machine / Standalone mode
 ---
 
-docker-locust can be run as **standalone** version by passing parameter **STANDALONE=true** at the beginning of the script. Standalone version is for users who has only 1 single machine.
+docker-locust will be run as **standalone** version by default. Standalone version is for users who has only 1 single machine.
 
 ```bash
-STANDALONE=true bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy
+bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy
 ```
 
 You will be prompted for certains inputs required (You can use [our example] in github as load test script).
@@ -56,7 +56,13 @@ Run type [automatic/manual]: manual
 *All of it can be simplify in one line:*
 
 ```bash
-STANDALONE=true bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py 4 manual
+bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy --target=https://targeturl.com --locust-file=https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py --slaves=4 --mode=manual
+```
+
+It is also possible to run with normal docker command:
+
+```bash
+docker run -i -v $PWD/reports:/opt/reports -p 8089:8089 -e ROLE=standalone -e TARGET_HOST=https://targeturl.com -e LOCUST_FILE=https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py -e SLAVE_MUL=4 -e AUTOMATIC=False
 ```
 
 ### Multiple machines
@@ -67,7 +73,7 @@ docker-locust can be run in multiple docker-containers. It is useful for users w
 Run the application with the command:
 
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy
+MULTI_CONTAINERS=true bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy
 ```
 
 Read multiple files
@@ -75,7 +81,7 @@ Read multiple files
 docker-locust has the ability to read multiple files from s3 or any http/https, e.g. [1 file is the load test file / python file](https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple_post.py) and [1 other file is json file](https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/payloads.json) where payloads are stored. Sample command:
 
 ```bash
-STANDALONE=true bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple_post.py,https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/payloads.json 4 manual
+bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy --target=https://targeturl.com --locust-file=https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple_post.py,https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/payloads.json --slaves=4 --mode=manual
 ```
 
 Report Generation
@@ -112,7 +118,7 @@ docker-locust can be run automatically by using CI tool like jenkins.
 1. Put following command in "Execute shell" field:
 
 	```bash
-	(echo 100 && echo 5 && echo 30) | STANDALONE=true bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py 4 automatic
+	bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy --target=https://targeturl.com --locust-file=https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py --slaves=4 --mode=automatic --users=100 --hatch-rate=5 --duration=30
 	```
 
 2. Install [html-publisher-plugin] in jenkins to display load test result. Example configuration in jenkins job:
