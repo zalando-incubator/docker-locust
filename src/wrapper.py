@@ -1,6 +1,5 @@
 #!/usr/bin/env python2
 
-import errno
 import logging
 
 import multiprocessing
