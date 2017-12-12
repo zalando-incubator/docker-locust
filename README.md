@@ -18,7 +18,7 @@ Docker-Locust consist of 3 different roles:
 This architecture support following type of deployment:
 
 - single container (standalone mode): If user have only one single machine.
-- multiple containers (normal mdoe): If user have more than one machine and want to create bigger load. This type of deployment might be used in docker-swarm or kubernetes case. An example for deployment in different containers can be seen in [docker-compose].
+- multiple containers (normal mode): If user have more than one machine and want to create bigger load. This type of deployment might be used in docker-swarm or kubernetes case. An example for deployment in different containers can be seen in [docker-compose].
 
 Key advantages
 --------------
