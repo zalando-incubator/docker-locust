@@ -6,7 +6,7 @@ import mock
 
 import requests_mock
 
-from src.wrapper import bootstrap
+from src.app import bootstrap
 
 
 class TestBootstrap(TestCase):
@@ -17,7 +17,7 @@ class TestBootstrap(TestCase):
         os.environ['ROLE'] = 'master'
         os.environ['TARGET_HOST'] = 'https://test.com'
 
-        with mock.patch('src.wrapper.get_locust_file') as file:
+        with mock.patch('src.app.get_locust_file') as file:
             bootstrap()
             self.assertTrue(file.called)
             self.assertTrue(popen.called)
@@ -29,7 +29,7 @@ class TestBootstrap(TestCase):
         os.environ['MASTER_HOST'] = '127.0.0.1'
         os.environ['SLAVE_MUL'] = '3'
 
-        with mock.patch('src.wrapper.get_locust_file') as file:
+        with mock.patch('src.app.get_locust_file') as file:
             bootstrap()
             self.assertTrue(file.called)
             self.assertTrue(mocked_popen.called)
@@ -50,7 +50,7 @@ class TestBootstrap(TestCase):
         os.environ['AUTOMATIC'] = '1'
         os.environ['LOC'] = '1'
 
-        with mock.patch('src.wrapper.get_locust_file'):
+        with mock.patch('src.app.get_locust_file'):
             bootstrap()
             self.assertTrue(mocked_popen.called)
 

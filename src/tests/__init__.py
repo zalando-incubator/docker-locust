@@ -2,7 +2,7 @@
 import os
 from unittest import TestCase
 
-from src import wrapper
+from src import app
 
 
 class TestApp(TestCase):
@@ -17,13 +17,13 @@ class TestApp(TestCase):
 
     def test_valid_env(self):
         os.environ[self.key] = 'test'
-        self.assertIsNotNone(wrapper.get_or_raise(self.key))
+        self.assertIsNotNone(app.get_or_raise(self.key))
 
     def test_empty_env(self):
         with self.assertRaises(RuntimeError):
-            wrapper.get_or_raise(self.key)
+            app.get_or_raise(self.key)
 
     def test_str_to_bool(self):
-        self.assertEqual(True, wrapper.convert_str_to_bool('TRUE'))
-        self.assertEqual(True, wrapper.convert_str_to_bool('tRuE'))
-        self.assertEqual(False, wrapper.convert_str_to_bool(1))
+        self.assertEqual(True, app.convert_str_to_bool('TRUE'))
+        self.assertEqual(True, app.convert_str_to_bool('tRuE'))
+        self.assertEqual(False, app.convert_str_to_bool(1))
