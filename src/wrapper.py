@@ -92,11 +92,8 @@ def bootstrap(_return=0):
 
                         logging.info('Creating report folder.')
                         report_path = os.path.join(os.getcwd(), 'reports')
-                        try:
+                        if not os.path.exists(report_path):
                             os.makedirs(report_path)
-                        except OSError as e:
-                            if e.errno != errno.EEXIST:
-                                raise
 
                         logger.info('Creating reports...')
                         for _url in ['requests', 'distribution']:
