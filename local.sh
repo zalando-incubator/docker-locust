@@ -103,16 +103,6 @@ ________________________________________________________________________________
 _________________________________________________________________________________
 EOF
     IMAGE="registry.opensource.zalan.do/tip/docker-locust"
-    echo "----------------------------------------------"       
-    echo "             Download compose file            "     
-    echo "----------------------------------------------"     
-    COMPOSE_FILE=docker-compose.yaml      
-    if [ ! -f $COMPOSE_FILE ]; then       
-        curl -o $COMPOSE_FILE https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/docker-compose.yaml        
-        echo -e "Download completed! \xE2\x9C\x94"        
-    else      
-        echo -e 'File is found, download is not needed! \xE2\x9C\x94'     
-    fi
 
     [ -z "$TARGET" ] && read -p "Target url: " TARGET
     [ -z "$LOCUST_FILE" ] && read -p "Where load test script is stored (e.g. https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py): " LOCUST_FILE
@@ -128,6 +118,12 @@ EOF
         AUTOMATIC=False
     fi
 
+    if [[ "$STANDALONE" =~ ^(True|true|T|t|1)$ ]]; then
+        STANDALONE=true
+    else
+        STANDALONE=false
+    fi
+
     echo "----------------------------------------------"
     echo "                   VARIABLES                  "
     echo "----------------------------------------------"
@@ -138,28 +134,48 @@ EOF
     echo "NUMBER OF USERS: $USERS"
     echo "HATCH_RATE: $HATCH_RATE"
     echo "DURATION [in seconds]: $DURATION"
+    echo "STANDALONE: $STANDALONE"
     echo "----------------------------------------------"
 
-    echo "Kill old containers if available"
-    docker-compose kill
+    if $STANDALONE; then
+        echo "Run in standalone mode"
+        docker run -i -v $PWD/reports:/opt/reports -p 8089:8089 -e ROLE=standalone -e TARGET_HOST=$TARGET \
+        -e LOCUST_FILE=$LOCUST_FILE -e SLAVE_MUL=$SLAVES -e AUTOMATIC=$AUTOMATIC -e USERS=$USERS \
+        -e HATCH_RATE=$HATCH_RATE -e DURATION=$DURATION $IMAGE
+    else
+        echo "Run in normal mode"
+        echo "----------------------------------------------"
+        echo "             Download compose file            "
+        echo "----------------------------------------------"
+        COMPOSE_FILE=docker-compose.yaml
+        if [ ! -f $COMPOSE_FILE ]; then
+            curl -o $COMPOSE_FILE https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/docker-compose.yaml
+            echo -e "Download completed! \xE2\x9C\x94"
+        else
+            echo -e 'File is found, download is not needed! \xE2\x9C\x94'
+        fi
 
-    echo "Remove old containers"
-    echo y | docker-compose rm
+        echo "Kill old containers if available"
+        docker-compose kill
 
-    echo "Remove old reports"
-    rm -rf reports
+        echo "Remove old containers"
+        echo y | docker-compose rm
 
-    echo "Deploy Locust application locally"
-    (export IMAGE=$IMAGE && export TARGET_HOST=$TARGET && export LOCUST_FILE=$LOCUST_FILE && export SLAVE_NUM=$SLAVES &&
-    export AUTOMATIC=$AUTOMATIC && export USERS=$USERS && export HATCH_RATE=$HATCH_RATE &&
-    export DURATION=$DURATION && docker-compose up -d)
+        echo "Remove old reports"
+        rm -rf reports
 
-    echo "Locust application is successfully deployed. you can access http://<docker-host-ip-address>:8089"
+        echo "Deploy Locust application locally"
+        (export IMAGE=$IMAGE && export TARGET_HOST=$TARGET && export LOCUST_FILE=$LOCUST_FILE && export SLAVE_NUM=$SLAVES &&
+        export AUTOMATIC=$AUTOMATIC && export USERS=$USERS && export HATCH_RATE=$HATCH_RATE &&
+        export DURATION=$DURATION && docker-compose up -d)
 
-    if [[ "$MODE" =~ ^(automatic|Automatic|auto)$ ]]; then
-        sleep 8
-        sleep $DURATION
-        docker cp docker_locusts_controller:/opt/reports .
+        echo "Locust application is successfully deployed. you can access http://<docker-host-ip-address>:8089"
+
+        if [[ "$MODE" =~ ^(automatic|Automatic|auto)$ ]]; then
+            sleep 8
+            sleep $DURATION
+            docker cp docker_locusts_controller:/opt/reports .
+        fi
     fi
 }
 
