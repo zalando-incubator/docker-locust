@@ -24,6 +24,7 @@ RUN pip install -r /tmp/requirements.txt
 #=====================
 COPY src /opt/src/
 COPY setup.cfg /opt/
+RUN ln -s /opt/src/app.py /usr/local/bin/locust-wrapper
 WORKDIR /opt
 ENV PYTHONPATH .
 ARG DL_IMAGE_VERSION=latest

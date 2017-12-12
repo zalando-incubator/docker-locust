@@ -4,11 +4,12 @@ import logging
 
 import multiprocessing
 import os
-import requests
+
 import signal
 import subprocess
 import sys
 
+import requests
 
 processes = []
 logging.basicConfig()
@@ -59,7 +60,7 @@ def bootstrap(_return=0):
         logger.info('Automatic run: {auto}'.format(auto=automatic))
 
         if not automatic:
-          return
+            return
 
         try:
             master_host = get_or_raise('MASTER_HOST')
@@ -86,17 +87,21 @@ def bootstrap(_return=0):
                         requests.get(url=master_url + '/stop')
                         logger.info('Load test is stopped.')
 
-                        logger.info('Downloading reports...')
                         time.sleep(4)
-                        report_path = os.path.join(os.getcwd(), 'reports')
-                        os.makedirs(report_path)
 
+                        logging.info('Creating report folder.')
+                        report_path = os.path.join(os.getcwd(), 'reports')
+                        if not os.path.exists(report_path):
+                            os.makedirs(report_path)
+
+                        logger.info('Creating reports...')
                         for _url in ['requests', 'distribution']:
                             res = requests.get(url=master_url + '/stats/' + _url + '/csv')
                             with open(os.path.join(report_path, _url + '.csv'), "wb") as file:
                                 file.write(res.content)
 
-                            if _url == 'distribution': continue
+                            if _url == 'distribution':
+                                continue
                             res = requests.get(url=master_url + '/stats/' + _url)
                             with open(os.path.join(report_path, _url + '.json'), "wb") as file:
                                 file.write(res.content)
@@ -104,7 +109,7 @@ def bootstrap(_return=0):
                         res = requests.get(url=master_url + '/htmlreport')
                         with open(os.path.join(report_path, 'reports.html'), "wb") as file:
                             file.write(res.content)
-                        logger.info('Reports have been successfully downloaded.')
+                        logger.info('Reports have been successfully created.')
                     else:
                         logger.error('Locust cannot be started. Please check logs!')
 
@@ -114,7 +119,6 @@ def bootstrap(_return=0):
                                  'Status code: {status}'.format(attempt=_, status=res.status_code))
         except ValueError as v_err:
             logger.error(v_err)
-
 
     elif role == 'standalone':
         automatic = convert_str_to_bool(os.getenv('AUTOMATIC', str(False)))
@@ -188,7 +192,7 @@ def get_locust_file():
         else:
             logger.info('Load test script from local machine')
             if file.endswith('.py'):
-                file_name = file if file.startswith('/') else  '/'.join(['script', file])
+                file_name = file if file.startswith('/') else '/'.join(['script', file])
     logger.info('load test file: {f}'.format(f=file_name))
     return file_name
 
