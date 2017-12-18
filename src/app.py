@@ -67,6 +67,8 @@ def bootstrap(_return=0):
             master_url = 'http://{master}:8089'.format(master=master_host)
             total_slaves = int(os.getenv('TOTAL_SLAVES')) if os.getenv('TOTAL_SLAVES') else int(
                 os.getenv('SLAVE_MUL', multiprocessing.cpu_count()))
+            ATTEMPTS = int(os.getenv('ATTEMPTS', 6))
+            DELAY_TIME = int(os.getenv('DELAY', 10))
             users = int(get_or_raise('USERS'))
             hatch_rate = int(get_or_raise('HATCH_RATE'))
             duration = int(get_or_raise('DURATION'))
@@ -81,7 +83,9 @@ def bootstrap(_return=0):
                 res = requests.get(url=master_url)
                 if res.ok:
                     connected_slave = 0
-                    for attempt in range(0, 3):
+                    # Default time duration to wait all slaves to be connected is 1 minutes
+                    # (10 sec * 6 attempts / 60 min)
+                    for attempt in range(0, ATTEMPTS):
                         try:
                             logger.info('Checking if all slave(s) are connected. [attempt:{a}]'.format(a=attempt))
                             stats_url = '/'.join([master_url, 'stats/requests'])
@@ -92,6 +96,7 @@ def bootstrap(_return=0):
                                 break
                             else:
                                 logger.info('Current connected slave: {con}'.format(con=connected_slave))
+                                time.sleep(DELAY_TIME)
                         except ValueError as v_err:
                             logger.error(v_err.message)
                     else:
