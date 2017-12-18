@@ -65,6 +65,8 @@ def bootstrap(_return=0):
         try:
             master_host = get_or_raise('MASTER_HOST')
             master_url = 'http://{master}:8089'.format(master=master_host)
+            total_slaves = int(os.getenv('TOTAL_SLAVES')) if os.getenv('TOTAL_SLAVES') else int(
+                os.getenv('SLAVE_MUL', multiprocessing.cpu_count()))
             users = int(get_or_raise('USERS'))
             hatch_rate = int(get_or_raise('HATCH_RATE'))
             duration = int(get_or_raise('DURATION'))
@@ -78,7 +80,26 @@ def bootstrap(_return=0):
 
                 res = requests.get(url=master_url)
                 if res.ok:
-                    logger.info('Start load test automatically for {duration} seconds.'.format(duration=duration))
+                    connected_slave = 0
+                    for attempt in range(0, 3):
+                        try:
+                            logger.info('Checking if all slave(s) are connected. [attempt:{a}]'.format(a=attempt))
+                            stats_url = '/'.join([master_url, 'stats/requests'])
+                            res = requests.get(url=stats_url)
+                            connected_slave = res.json().get('slave_count')
+
+                            if connected_slave == total_slaves:
+                                break
+                            else:
+                                logger.info('Current connected slave: {con}'.format(con=connected_slave))
+                        except ValueError as v_err:
+                            logger.error(v_err.message)
+                    else:
+                        logger.error('Connected slaves:{con} != defined slaves:{dfn}'.format(
+                            con=connected_slave, dfn=total_slaves))
+                        sys.exit(1)
+                    logger.info('All slaves are succesfully connected! '
+                                'Start load test automatically for {duration} seconds.'.format(duration=duration))
                     payload = {'locust_count': users, 'hatch_rate': hatch_rate}
                     res = requests.post(url=master_url + '/swarm', data=payload)
 

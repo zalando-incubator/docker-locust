@@ -36,7 +36,7 @@ services:
       - ROLE=controller
       - MASTER_HOST=master
       - AUTOMATIC=$AUTOMATIC
+      - TOTAL_SLAVES=$SLAVE_NUM
       - USERS=$USERS
       - HATCH_RATE=$HATCH_RATE
-      - SLAVE_MUL=$SLAVE_NUM
       - DURATION=$DURATION
