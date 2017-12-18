@@ -68,9 +68,9 @@ def bootstrap(_return=0):
             total_slaves = int(os.getenv('TOTAL_SLAVES')) if os.getenv('TOTAL_SLAVES') else int(
                 os.getenv('SLAVE_MUL', multiprocessing.cpu_count()))
             # Default time duration to wait all slaves to be connected is 1 minutes / 60 seconds
-            SLAVES_WAITING_TIME = float(os.getenv('SLAVES_WAITING_TIME', 60))
+            SLAVES_WAITING_TIME = float(os.getenv('SLAVES_CHECK_TIMEOUT', 60))
             # Default sleep time interval is 10 seconds
-            SLAVES_SLEEP_TIME = float(os.getenv('SLAVES_SLEEP_INTERVAL', 10))
+            SLAVES_SLEEP_TIME = float(os.getenv('SLAVES_CHECK_INTERVAL', 5))
             users = int(get_or_raise('USERS'))
             hatch_rate = int(get_or_raise('HATCH_RATE'))
             duration = int(get_or_raise('DURATION'))
@@ -85,25 +85,24 @@ def bootstrap(_return=0):
                 res = requests.get(url=master_url)
                 if res.ok:
                     timeout = time.time() + SLAVES_WAITING_TIME
-                    connected_slave = 0
+                    connected_slaves = 0
                     while time.time() < timeout:
                         try:
                             logger.info('Checking if all slave(s) are connected.')
                             stats_url = '/'.join([master_url, 'stats/requests'])
                             res = requests.get(url=stats_url)
-                            connected_slave = res.json().get('slave_count')
+                            connected_slaves = res.json().get('slave_count')
 
-                            if connected_slave == total_slaves:
+                            if connected_slaves >= total_slaves:
                                 break
                             else:
-                                logger.info('Current connected slave: {con}'.format(con=connected_slave))
+                                logger.info('Current connected slave: {con}'.format(con=connected_slaves))
                                 time.sleep(SLAVES_SLEEP_TIME)
                         except ValueError as v_err:
                             logger.error(v_err.message)
                     else:
-                        logger.error('Connected slaves:{con} != defined slaves:{dfn}'.format(
-                            con=connected_slave, dfn=total_slaves))
-                        sys.exit(1)
+                        logger.warning('Connected slaves:{con} != defined slaves:{dfn}'.format(
+                            con=connected_slaves, dfn=total_slaves))
 
                     logger.info('All slaves are succesfully connected! '
                                 'Start load test automatically for {duration} seconds.'.format(duration=duration))

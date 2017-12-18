@@ -88,8 +88,10 @@ class TestBootstrap(TestCase):
         self.assertTrue(mocked_open.called)
 
     @mock.patch('time.sleep')
+    @mock.patch('os.makedirs')
+    @mock.patch('__builtin__.open')
     @requests_mock.Mocker()
-    def test_slaves_not_fully_connected(self, mocked_timeout, mocked_request):
+    def test_slaves_not_fully_connected(self, mocked_timeout, mocked_dir, mocked_open, mocked_request):
         os.environ['ROLE'] = 'controller'
         os.environ['AUTOMATIC'] = str(True)
         os.environ['MASTER_HOST'] = '127.0.0.1'
@@ -97,20 +99,25 @@ class TestBootstrap(TestCase):
         os.environ['USERS'] = '100'
         os.environ['HATCH_RATE'] = '5'
         os.environ['DURATION'] = '10'
-        os.environ['SLAVES_WAITING_TIME'] = '0.3'
-        os.environ['SLAVES_SLEEP_INTERVAL'] = '0.1'
+        os.environ['SLAVES_CHECK_TIMEOUT'] = '0.3'
+        os.environ['SLAVES_CHECK_INTERVAL'] = '0.1'
 
         MASTER_URL = 'http://127.0.0.1:8089'
         mocked_request.get(url=MASTER_URL, text='ok')
         mocked_request.get(url=MASTER_URL + '/stats/requests', json={'slave_count': 1})
+        mocked_request.post(url='/'.join([MASTER_URL, 'swarm']), text='ok')
+        for endpoint in ['stop', 'stats/requests/csv', 'stats/distribution/csv', 'htmlreport']:
+            mocked_request.get(url='/'.join([MASTER_URL, endpoint]), text='ok')
 
         self.assertFalse(mocked_timeout.called)
         self.assertFalse(mocked_request.called)
-        with self.assertRaises(SystemExit) as exit_code:
-            bootstrap()
+        self.assertFalse(mocked_dir.called)
+        self.assertFalse(mocked_open.called)
+        bootstrap()
         self.assertTrue(mocked_timeout.called)
         self.assertTrue(mocked_request.called)
-        self.assertEqual(exit_code.exception.code, 1)
+        self.assertTrue(mocked_dir.called)
+        self.assertTrue(mocked_open.called)
 
     def test_invalid_role(self):
         os.environ['ROLE'] = 'unknown'
