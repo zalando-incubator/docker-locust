@@ -67,8 +67,10 @@ def bootstrap(_return=0):
             master_url = 'http://{master}:8089'.format(master=master_host)
             total_slaves = int(os.getenv('TOTAL_SLAVES')) if os.getenv('TOTAL_SLAVES') else int(
                 os.getenv('SLAVE_MUL', multiprocessing.cpu_count()))
-            ATTEMPTS = int(os.getenv('ATTEMPTS', 6))
-            DELAY_TIME = int(os.getenv('DELAY', 10))
+            # Default time duration to wait all slaves to be connected is 1 minutes / 60 seconds
+            SLAVES_WAITING_TIME = float(os.getenv('SLAVES_WAITING_TIME', 60))
+            # Default sleep time interval is 10 seconds
+            SLAVES_SLEEP_TIME = float(os.getenv('SLAVES_SLEEP_INTERVAL', 10))
             users = int(get_or_raise('USERS'))
             hatch_rate = int(get_or_raise('HATCH_RATE'))
             duration = int(get_or_raise('DURATION'))
@@ -82,12 +84,11 @@ def bootstrap(_return=0):
 
                 res = requests.get(url=master_url)
                 if res.ok:
+                    timeout = time.time() + SLAVES_WAITING_TIME
                     connected_slave = 0
-                    # Default time duration to wait all slaves to be connected is 1 minutes
-                    # (10 sec * 6 attempts / 60 min)
-                    for attempt in range(0, ATTEMPTS):
+                    while time.time() < timeout:
                         try:
-                            logger.info('Checking if all slave(s) are connected. [attempt:{a}]'.format(a=attempt))
+                            logger.info('Checking if all slave(s) are connected.')
                             stats_url = '/'.join([master_url, 'stats/requests'])
                             res = requests.get(url=stats_url)
                             connected_slave = res.json().get('slave_count')
@@ -96,13 +97,14 @@ def bootstrap(_return=0):
                                 break
                             else:
                                 logger.info('Current connected slave: {con}'.format(con=connected_slave))
-                                time.sleep(DELAY_TIME)
+                                time.sleep(SLAVES_SLEEP_TIME)
                         except ValueError as v_err:
                             logger.error(v_err.message)
                     else:
                         logger.error('Connected slaves:{con} != defined slaves:{dfn}'.format(
                             con=connected_slave, dfn=total_slaves))
                         sys.exit(1)
+
                     logger.info('All slaves are succesfully connected! '
                                 'Start load test automatically for {duration} seconds.'.format(duration=duration))
                     payload = {'locust_count': users, 'hatch_rate': hatch_rate}

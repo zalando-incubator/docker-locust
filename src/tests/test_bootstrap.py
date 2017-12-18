@@ -97,6 +97,8 @@ class TestBootstrap(TestCase):
         os.environ['USERS'] = '100'
         os.environ['HATCH_RATE'] = '5'
         os.environ['DURATION'] = '10'
+        os.environ['SLAVES_WAITING_TIME'] = '0.3'
+        os.environ['SLAVES_SLEEP_INTERVAL'] = '0.1'
 
         MASTER_URL = 'http://127.0.0.1:8089'
         mocked_request.get(url=MASTER_URL, text='ok')
