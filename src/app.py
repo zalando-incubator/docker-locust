@@ -96,7 +96,7 @@ def bootstrap(_return=0):
                             if connected_slaves >= total_slaves:
                                 break
                             else:
-                                logger.info('Currently connected slave: {con}'.format(con=connected_slaves))
+                                logger.info('Currently connected slaves: {con}'.format(con=connected_slaves))
                                 time.sleep(slaves_check_interval)
                         except ValueError as v_err:
                             logger.error(v_err.message)
