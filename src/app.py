@@ -68,9 +68,9 @@ def bootstrap(_return=0):
             total_slaves = int(os.getenv('TOTAL_SLAVES')) if os.getenv('TOTAL_SLAVES') else int(
                 os.getenv('SLAVE_MUL', multiprocessing.cpu_count()))
             # Default time duration to wait all slaves to be connected is 1 minutes / 60 seconds
-            SLAVES_WAITING_TIME = float(os.getenv('SLAVES_CHECK_TIMEOUT', 60))
+            slaves_check_timeout = float(os.getenv('SLAVES_CHECK_TIMEOUT', 60))
             # Default sleep time interval is 10 seconds
-            SLAVES_SLEEP_TIME = float(os.getenv('SLAVES_CHECK_INTERVAL', 5))
+            slaves_check_interval = float(os.getenv('SLAVES_CHECK_INTERVAL', 5))
             users = int(get_or_raise('USERS'))
             hatch_rate = int(get_or_raise('HATCH_RATE'))
             duration = int(get_or_raise('DURATION'))
@@ -84,7 +84,7 @@ def bootstrap(_return=0):
 
                 res = requests.get(url=master_url)
                 if res.ok:
-                    timeout = time.time() + SLAVES_WAITING_TIME
+                    timeout = time.time() + slaves_check_timeout
                     connected_slaves = 0
                     while time.time() < timeout:
                         try:
@@ -96,8 +96,8 @@ def bootstrap(_return=0):
                             if connected_slaves >= total_slaves:
                                 break
                             else:
-                                logger.info('Current connected slave: {con}'.format(con=connected_slaves))
-                                time.sleep(SLAVES_SLEEP_TIME)
+                                logger.info('Currently connected slave: {con}'.format(con=connected_slaves))
+                                time.sleep(slaves_check_interval)
                         except ValueError as v_err:
                             logger.error(v_err.message)
                     else:
