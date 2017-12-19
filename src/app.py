@@ -65,6 +65,12 @@ def bootstrap(_return=0):
         try:
             master_host = get_or_raise('MASTER_HOST')
             master_url = 'http://{master}:8089'.format(master=master_host)
+            total_slaves = int(os.getenv('TOTAL_SLAVES')) if os.getenv('TOTAL_SLAVES') else int(
+                os.getenv('SLAVE_MUL', multiprocessing.cpu_count()))
+            # Default time duration to wait all slaves to be connected is 1 minutes / 60 seconds
+            slaves_check_timeout = float(os.getenv('SLAVES_CHECK_TIMEOUT', 60))
+            # Default sleep time interval is 10 seconds
+            slaves_check_interval = float(os.getenv('SLAVES_CHECK_INTERVAL', 5))
             users = int(get_or_raise('USERS'))
             hatch_rate = int(get_or_raise('HATCH_RATE'))
             duration = int(get_or_raise('DURATION'))
@@ -78,7 +84,28 @@ def bootstrap(_return=0):
 
                 res = requests.get(url=master_url)
                 if res.ok:
-                    logger.info('Start load test automatically for {duration} seconds.'.format(duration=duration))
+                    timeout = time.time() + slaves_check_timeout
+                    connected_slaves = 0
+                    while time.time() < timeout:
+                        try:
+                            logger.info('Checking if all slave(s) are connected.')
+                            stats_url = '/'.join([master_url, 'stats/requests'])
+                            res = requests.get(url=stats_url)
+                            connected_slaves = res.json().get('slave_count')
+
+                            if connected_slaves >= total_slaves:
+                                break
+                            else:
+                                logger.info('Currently connected slaves: {con}'.format(con=connected_slaves))
+                                time.sleep(slaves_check_interval)
+                        except ValueError as v_err:
+                            logger.error(v_err.message)
+                    else:
+                        logger.warning('Connected slaves:{con} != defined slaves:{dfn}'.format(
+                            con=connected_slaves, dfn=total_slaves))
+
+                    logger.info('All slaves are succesfully connected! '
+                                'Start load test automatically for {duration} seconds.'.format(duration=duration))
                     payload = {'locust_count': users, 'hatch_rate': hatch_rate}
                     res = requests.post(url=master_url + '/swarm', data=payload)
 
