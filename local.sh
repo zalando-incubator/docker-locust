@@ -174,9 +174,9 @@ EOF
         fi
     else
         echo "Run in standalone mode"
-        docker run -i --rm -v $PWD/reports:/opt/reports -p 8089:8089 -e ROLE=standalone -e TARGET_HOST=$TARGET \
-        -e LOCUST_FILE=$LOCUST_FILE -e SLAVE_MUL=$SLAVES -e AUTOMATIC=$AUTOMATIC -e USERS=$USERS \
-        -e HATCH_RATE=$HATCH_RATE -e DURATION=$DURATION $IMAGE
+        docker run -i --rm -v $PWD/reports:/opt/reports -v ~/.aws:/root/.aws -v $PWD/:/opt/script -p 8089:8089 \
+        -e ROLE=standalone -e TARGET_HOST=$TARGET -e LOCUST_FILE=$LOCUST_FILE -e SLAVE_MUL=$SLAVES \
+        -e AUTOMATIC=$AUTOMATIC -e USERS=$USERS -e HATCH_RATE=$HATCH_RATE -e DURATION=$DURATION $IMAGE
     fi
 }
 
