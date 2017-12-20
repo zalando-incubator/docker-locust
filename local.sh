@@ -102,7 +102,9 @@ ________________________________________________________________________________
                          L O C A L - D E P L O Y M E N T
 _________________________________________________________________________________
 EOF
-    IMAGE="registry.opensource.zalan.do/tip/docker-locust"
+    if [ -z $IMAGE ]; then
+        IMAGE="registry.opensource.zalan.do/tip/docker-locust"
+    fi
 
     [ -z "$TARGET" ] && read -p "Target url: " TARGET
     [ -z "$LOCUST_FILE" ] && read -p "Where load test script is stored (e.g. https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py): " LOCUST_FILE
