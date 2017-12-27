@@ -33,3 +33,5 @@ class SimplePostBehavior(TaskSet):
 
 class MyLocust(HttpLocust):
     task_set = SimplePostBehavior
+    min_wait = 0
+    max_wait = 0
