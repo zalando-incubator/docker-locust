@@ -26,6 +26,9 @@ services:
       - TARGET_HOST=$TARGET_HOST
       - LOCUST_FILE=$LOCUST_FILE
       - SLAVE_MUL=$SLAVE_NUM
+      - OAUTH=$OAUTH
+      - URL=$URL
+      - SCOPES=$SCOPES
   controller:
     image: $IMAGE
     container_name: docker_locusts_controller
