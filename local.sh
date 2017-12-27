@@ -163,7 +163,7 @@ EOF
         echo "Deploy Locust application locally"
         (export IMAGE=$IMAGE && export TARGET_HOST=$TARGET && export LOCUST_FILE=$LOCUST_FILE && export SLAVE_NUM=$SLAVES &&
         export AUTOMATIC=$AUTOMATIC && export USERS=$USERS && export HATCH_RATE=$HATCH_RATE &&
-        export DURATION=$DURATION && docker-compose up -d)
+        export DURATION=$DURATION && export OAUTH=$OAUTH && URL=$URL && export SCOPES=$SCOPES && docker-compose up -d)
 
         echo "Locust application is successfully deployed. you can access http://<docker-host-ip-address>:8089"
 
@@ -176,7 +176,8 @@ EOF
         echo "Run in standalone mode"
         docker run -i --rm -v $PWD/reports:/opt/reports -v ~/.aws:/root/.aws -v $PWD/:/opt/script -p 8089:8089 \
         -e ROLE=standalone -e TARGET_HOST=$TARGET -e LOCUST_FILE=$LOCUST_FILE -e SLAVE_MUL=$SLAVES \
-        -e AUTOMATIC=$AUTOMATIC -e USERS=$USERS -e HATCH_RATE=$HATCH_RATE -e DURATION=$DURATION $IMAGE
+        -e AUTOMATIC=$AUTOMATIC -e USERS=$USERS -e HATCH_RATE=$HATCH_RATE -e DURATION=$DURATION \
+        -e OAUTH=$OAUTH -e URL=$URL -e SCOPES=$SCOPES $IMAGE
     fi
 }
 
