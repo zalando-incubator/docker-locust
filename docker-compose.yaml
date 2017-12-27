@@ -20,7 +20,7 @@ services:
     volumes:
       - ~/.aws:/root/.aws
       - ./:/opt/script
-      - ./assets:/opt/assets
+      - ./credentials:/meta/credentials
     environment:
       - ROLE=slave
       - MASTER_HOST=master
