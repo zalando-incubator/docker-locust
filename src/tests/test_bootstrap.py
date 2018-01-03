@@ -117,7 +117,7 @@ class TestBootstrap(TestCase):
         self.assertTrue(mocked_timeout.called)
         self.assertTrue(mocked_request.called)
         self.assertTrue(mocked_dir.called)
-        self.assertTrue(mocked_open.called)
+        self.assertFalse(mocked_open.called)
 
     def test_invalid_role(self):
         os.environ['ROLE'] = 'unknown'
