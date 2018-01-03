@@ -91,8 +91,10 @@ EOF
 
     echo "Start unit test"
     docker run --name ${CONTAINER_NAME} ${IMAGE_NAME} nosetests -v
+    echo $?
     docker cp ${CONTAINER_NAME}:/opt/coverage.xml .
     docker cp ${CONTAINER_NAME}:/opt/xunit.xml .
+    echo $?
 }
 
 function deploy() {
