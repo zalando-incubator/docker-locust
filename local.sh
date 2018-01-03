@@ -75,14 +75,10 @@ ________________________________________________________________________________
 _________________________________________________________________________________
 EOF
     IMAGE_NAME=test_image_locust
-    CONTAINER_NAME=test_container_locust
 
     echo "Delete old reports"
     rm -f flake8.log
     rm -f coverage.xml xunit.xml
-
-    echo "Delete docker images"
-    docker stop ${CONTAINER_NAME} && docker rm ${CONTAINER_NAME}
 
     docker build -t ${IMAGE_NAME} .
 
@@ -90,11 +86,7 @@ EOF
     docker run --rm ${IMAGE_NAME} /bin/bash -c "flake8 ." > flake8.log
 
     echo "Start unit test"
-    docker run --name ${CONTAINER_NAME} ${IMAGE_NAME} nosetests -v
-    echo $?
-    docker cp ${CONTAINER_NAME}:/opt/coverage.xml .
-    docker cp ${CONTAINER_NAME}:/opt/xunit.xml .
-    echo $?
+    docker run --rm -v $PWD:/opt/result ${IMAGE_NAME} nosetests -v
 }
 
 function deploy() {
