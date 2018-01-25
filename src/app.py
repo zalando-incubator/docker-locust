@@ -187,7 +187,7 @@ def send_user_usage(target_host):
         host_in_array = target_host.split('.')
         if 'zalan.do' in target_host:
             contains_zalando = True
-        elif len(host_in_array) > 3 and 'zalando' in host_in_array[len(host_in_array) - 2]:
+        elif len(host_in_array) >= 2 and 'zalando' in host_in_array[len(host_in_array) - 2]:
             contains_zalando = True
         else:
             contains_zalando = False
