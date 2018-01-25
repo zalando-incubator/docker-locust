@@ -27,8 +27,8 @@ def bootstrap(_return=0):
     logger.info('Role :{role}'.format(role=role))
 
     if role == 'master':
-        send_user_usage()
         target_host = get_or_raise('TARGET_HOST')
+        send_user_usage(target_host)
         locust_file = get_locust_file()
         logger.info('target host: {target}, locust file: {file}'.format(target=target_host, file=locust_file))
 
@@ -171,7 +171,7 @@ def bootstrap(_return=0):
         s.communicate()
 
 
-def send_user_usage():
+def send_user_usage(target_host):
     """Send user usage to Google Analytics."""
 
     ga_endpoint = 'https://www.google-analytics.com/collect'
@@ -183,6 +183,14 @@ def send_user_usage():
         build_url = os.getenv('BUILD_URL')
         cdp_target_repository = os.getenv('CDP_TARGET_REPOSITORY')
         image_version = os.getenv('DL_IMAGE_VERSION', 'unknown')
+
+        host_in_array = target_host.split('.')
+        if 'zalan.do' in target_host:
+            contains_zalando = True
+        elif len(host_in_array) > 3 and 'zalando' in host_in_array[len(host_in_array) - 2]:
+            contains_zalando = True
+        else:
+            contains_zalando = False
 
         if app_id:
             user_type = 'internal'
@@ -201,6 +209,9 @@ def send_user_usage():
             with open('/proc/version', 'r') as v:
                 user = '_'.join(w for w in v.read().split(' ') if '@' not in w)
             description = '-'
+
+        if contains_zalando:
+            description += '; {host}'.format(host=target_host)
 
         payload = {
             'v': '1',  # API Version.

@@ -10,10 +10,12 @@ from src.app import send_user_usage
 class TestUserUsage(TestCase):
     """Unit test class to test method send_user_usage."""
 
+    TEST_URL = 'https://test.zalan.do'
+
     @requests_mock.Mocker()
     def test_not_to_send(self, mocked_request):
         os.environ['SEND_ANONYMOUS_USAGE_INFO'] = str(False)
-        send_user_usage()
+        send_user_usage(self.TEST_URL)
         self.assertFalse(mocked_request.called)
 
     @requests_mock.Mocker()
@@ -30,7 +32,7 @@ class TestUserUsage(TestCase):
         for k, v in platforms.items():
             os.environ[k] = v
             mocked_request.post(url='https://www.google-analytics.com/collect', text='ok')
-            send_user_usage()
+            send_user_usage(self.TEST_URL)
             self.assertTrue(mocked_request.called)
             del os.environ[k]
 
