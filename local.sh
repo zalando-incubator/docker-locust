@@ -161,7 +161,7 @@ EOF
         (export IMAGE=$IMAGE && export TARGET_HOST=$TARGET && export LOCUST_FILE=$LOCUST_FILE && export SLAVE_NUM=$SLAVES &&
         export AUTOMATIC=$AUTOMATIC && export USERS=$USERS && export HATCH_RATE=$HATCH_RATE &&
         export DURATION=$DURATION && export OAUTH=$OAUTH && URL=$URL && export SEND_ANONYMOUS_USAGE_INFO=$KPI &&
-        export SCOPES=$SCOPES && docker-compose up -d)
+        export SCOPES=$SCOPES && export BUILD_URL=$BUILD_URL && docker-compose up -d)
 
         echo "Locust application is successfully deployed. you can access http://<docker-host-ip-address>:8089"
 
@@ -176,7 +176,7 @@ EOF
         -v $PWD/credentials:/meta/credentials -p 8089:8089 -e ROLE=standalone -e TARGET_HOST=$TARGET \
         -e LOCUST_FILE=$LOCUST_FILE -e SLAVE_MUL=$SLAVES -e AUTOMATIC=$AUTOMATIC -e USERS=$USERS \
         -e HATCH_RATE=$HATCH_RATE -e DURATION=$DURATION -e OAUTH=$OAUTH -e URL=$URL -e SCOPES=$SCOPES \
-        -e SEND_ANONYMOUS_USAGE_INFO=$KPI $IMAGE
+        -e SEND_ANONYMOUS_USAGE_INFO=$KPI -e BUILD_URL=$BUILD_URL $IMAGE
     fi
 }
 
