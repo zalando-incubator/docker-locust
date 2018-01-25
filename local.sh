@@ -97,7 +97,7 @@ ________________________________________________________________________________
 _________________________________________________________________________________
 EOF
     if [ -z $IMAGE ]; then
-        IMAGE="registry.opensource.zalan.do/tip/docker-locust:test-02"
+        IMAGE="registry.opensource.zalan.do/tip/docker-locust"
     fi
 
     [ -z "$TARGET" ] && read -p "Target url: " TARGET
