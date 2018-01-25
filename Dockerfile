@@ -29,5 +29,6 @@ RUN ln -s /opt/src/app.py /usr/local/bin/locust-wrapper
 WORKDIR /opt
 ENV PYTHONPATH .
 ARG DL_IMAGE_VERSION=latest
-ENV DL_IMAGE_VERSION=$DL_IMAGE_VERSION
+ENV DL_IMAGE_VERSION=$DL_IMAGE_VERSION \
+    SEND_ANONYMOUS_USAGE_INFO=true
 CMD ["/usr/bin/python", "src/app.py"]

@@ -12,6 +12,7 @@ services:
       - ROLE=master
       - TARGET_HOST=$TARGET_HOST
       - LOCUST_FILE=$LOCUST_FILE
+      - SEND_ANONYMOUS_USAGE_INFO=$SEND_ANONYMOUS_USAGE_INFO
   slave:
     image: $IMAGE
     depends_on:

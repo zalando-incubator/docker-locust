@@ -27,6 +27,7 @@ def bootstrap(_return=0):
     logger.info('Role :{role}'.format(role=role))
 
     if role == 'master':
+        send_user_usage()
         target_host = get_or_raise('TARGET_HOST')
         locust_file = get_locust_file()
         logger.info('target host: {target}, locust file: {file}'.format(target=target_host, file=locust_file))
@@ -168,6 +169,59 @@ def bootstrap(_return=0):
 
     for s in processes:
         s.communicate()
+
+
+def send_user_usage():
+    """Send user usage to Google Analytics."""
+
+    ga_endpoint = 'https://www.google-analytics.com/collect'
+    ga_tracking_id = 'UA-110383676-1'
+    send_kpi = convert_str_to_bool(os.getenv('SEND_ANONYMOUS_USAGE_INFO', str(False)))
+
+    if send_kpi:
+        app_id = os.getenv('APPLICATION_ID')
+        build_url = os.getenv('BUILD_URL')
+        cdp_target_repository = os.getenv('CDP_TARGET_REPOSITORY')
+        image_version = os.getenv('DL_IMAGE_VERSION', 'unknown')
+
+        if app_id:
+            user_type = 'internal'
+            user = app_id.split('-')[0]
+            description = 'AWS'
+        elif build_url and 'zalan.do' in build_url:
+            user_type = 'internal'
+            user = build_url.split('/')[2].split('.')[0]
+            description = 'Jenkins'
+        elif cdp_target_repository and 'github' in cdp_target_repository:
+            user_type = 'internal'
+            user = cdp_target_repository.split('/')[1]
+            description = 'CDP'
+        else:
+            user_type = 'external/local-machine'
+            with open('/proc/version', 'r') as v:
+                user = '_'.join(w for w in v.read().split(' ') if '@' not in w)
+            description = '-'
+
+        payload = {
+            'v': '1',  # API Version.
+            'tid': ga_tracking_id,
+            'cid': user,
+            't': 'event',  # Event hit type.
+            'ec': user_type,
+            'ea': user,
+            'el': description,
+            'an': 'docker-locust',
+            'av': image_version,
+        }
+
+        for attempt in range(1, 4):
+            logger.info('attempt: {attempt}'.format(attempt=attempt))
+            res = requests.post(ga_endpoint, data=payload)
+            if res.ok:
+                logger.info('User usage is successfully sent!')
+                break
+        else:
+            logger.warning('User usage cannot be sent! response: {res}'.format(res.text))
 
 
 def get_locust_file():
