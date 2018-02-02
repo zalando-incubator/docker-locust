@@ -13,7 +13,8 @@ class TestBootstrap(TestCase):
     """Unit test class to test method bootstrap."""
 
     @mock.patch('subprocess.Popen')
-    def test_valid_master(self, popen):
+    @mock.patch('src.app.send_usage_statistics')
+    def test_valid_master(self, popen, mocked_send_usage):
         os.environ['ROLE'] = 'master'
         os.environ['TARGET_HOST'] = 'https://test.com'
 
@@ -21,6 +22,7 @@ class TestBootstrap(TestCase):
             bootstrap()
             self.assertTrue(file.called)
             self.assertTrue(popen.called)
+            self.assertTrue(mocked_send_usage.called)
 
     @mock.patch('subprocess.Popen')
     def test_valid_slave(self, mocked_popen):
@@ -45,7 +47,8 @@ class TestBootstrap(TestCase):
     @mock.patch('src.app.bootstrap')
     def test_standalone_manual(self, mocked_bootstrap):
         os.environ['ROLE'] = 'standalone'
-        bootstrap()
+        with mock.patch('src.app.send_usage_statistics'):
+            bootstrap()
         self.assertEqual(mocked_bootstrap.call_count, 2)
 
     @mock.patch('src.app.bootstrap')
@@ -53,7 +56,8 @@ class TestBootstrap(TestCase):
         os.environ['ROLE'] = 'standalone'
         os.environ['AUTOMATIC'] = str(True)
         with self.assertRaises(SystemExit) as exit_code:
-            bootstrap()
+            with mock.patch('src.app.send_usage_statistics'):
+                bootstrap()
         self.assertEqual(mocked_bootstrap.call_count, 3)
         self.assertEqual(exit_code.exception.code, 0)
 
@@ -124,13 +128,15 @@ class TestBootstrap(TestCase):
         with self.assertRaises(RuntimeError):
             bootstrap()
 
-    def test_missing_env_variables(self):
+    @mock.patch('src.app.send_usage_statistics')
+    def test_missing_env_variables(self, mocked_send_usage):
         roles = ['master', 'slave']
 
         for role in roles:
             os.environ['ROLE'] = role
             with self.assertRaises(RuntimeError):
                 bootstrap()
+                self.assertTrue(mocked_send_usage.called)
 
     def test_invalid_env_variables(self):
         os.environ['ROLE'] = 'controller'

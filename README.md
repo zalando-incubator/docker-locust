@@ -215,5 +215,5 @@ See [Security]
 [AWS-EC2-pricing]: <https://aws.amazon.com/ec2/pricing/on-demand/?nc1=h_ls>
 [guidelines]: <CONTRIBUTING.md>
 [maintainers]: <MAINTAINERS>
-[License]: <LICENSE>
+[License]: <LICENSE.md>
 [Security]: <SECURITY.md>
