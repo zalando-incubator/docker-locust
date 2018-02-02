@@ -141,7 +141,7 @@ A version number is combination between the locust version being supported and p
 Capacity of docker-locust in AWS
 --------------------------------
 
-All the data based on load testing against simple [hello-world] application.
+All the data based on load testing against simple [hello-world] application with the default max_wait and min_wait values (1000ms).
 
 |No.   |Group Type   |EC2   |vCPU   |RAM (GiB)   |Clock Speed (GHz)   |Enhanced Networking   |Max total RPS that can be created per 1 slave machine (rough number)   |Price per hour (EU - Frankfurt)   |RPS per cent   |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
