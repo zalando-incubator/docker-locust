@@ -15,7 +15,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 Additionally to Apache-2.0, when you fork this repo you are required to either remove our Google Analytics tracking ID: UA-110383676-1 or stop usage gathering completely.
 
 ## Data processing agreement
-By using this software you agree that the following non-PII (non personally identifiable information) data will be collected, processed and used by Zalando SE for the purpose of improving our test infrastructure tools. Anonymisation with respect of the IP address means that only the first two octets of the IP address are collected.
+By using this software you agree that the following non-PII (non personally identifiable information) data will be collected, processed and used by Zalando SE for the purpose of improving our test infrastructure tools.
 
 
 By using this software you also grant us a nonexclusive, irrevocable, world-wide, perpetual royalty-free permission to use, modify and publish these data for all purposes, internally or publicly, including the right to sub-license said permission rights.
@@ -24,7 +24,6 @@ By using this software you also grant us a nonexclusive, irrevocable, world-wide
 We collect, process and use the following data:
 
 * Docker-Locust version
-* Anonymized IP address (only first two octets)
 * Country and city
 * Date and time when Docker-Locust started
 * User type, e.g. external or internal

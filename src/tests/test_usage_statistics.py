@@ -4,7 +4,7 @@ from unittest import TestCase
 
 import requests_mock
 
-from src.app import send_user_usage
+from src.app import send_usage_statistics
 
 
 class TestUserUsage(TestCase):
@@ -13,13 +13,7 @@ class TestUserUsage(TestCase):
     TEST_URL = 'https://test.zalan.do'
 
     @requests_mock.Mocker()
-    def test_not_to_send(self, mocked_request):
-        os.environ['SEND_ANONYMOUS_USAGE_INFO'] = str(False)
-        send_user_usage(self.TEST_URL)
-        self.assertFalse(mocked_request.called)
-
-    @requests_mock.Mocker()
-    def test_send_usage_usage(self, mocked_request):
+    def test_send_usage_statistics(self, mocked_request):
         os.environ['SEND_ANONYMOUS_USAGE_INFO'] = str(True)
         os.environ['DL_IMAGE_VERSION'] = '1.0'
         platforms = {
@@ -32,7 +26,7 @@ class TestUserUsage(TestCase):
         for k, v in platforms.items():
             os.environ[k] = v
             mocked_request.post(url='https://www.google-analytics.com/collect', text='ok')
-            send_user_usage(self.TEST_URL)
+            send_usage_statistics(self.TEST_URL)
             self.assertTrue(mocked_request.called)
             del os.environ[k]
 
