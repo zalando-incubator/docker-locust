@@ -216,6 +216,7 @@ def send_usage_statistics(target_host):
 
         payload = {
             'v': '1',  # API Version.
+            'aip': 1,
             'tid': ga_tracking_id,
             'cid': user,
             't': 'event',  # Event hit type.
