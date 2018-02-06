@@ -197,7 +197,7 @@ def send_usage_statistics(target_host):
             user_type = 'internal'
             user = app_id.split('-')[0]
             description = 'AWS'
-        elif build_url and build_url.endwith('zalan.do'):
+        elif build_url and build_url.endswith('zalan.do'):
             user_type = 'internal'
             user = build_url.split('/')[2].split('.')[0]
             description = 'Jenkins'
