@@ -14,9 +14,9 @@ MOCKED_STATISTIC = os.path.join(WORK_DIR, 'mocked_statistic.json')
 TEST_REPORT = os.path.join(WORK_DIR, 'test-report.html')
 
 
+@requests_mock.mock()
 class ReportGeneratorTests(TestCase):
 
-    @requests_mock.mock()
     def test_generate_report(self, mocked_request):
         response = json.load(open(MOCKED_STATISTIC))
         mocked_request.get(STAT_URL, json=response)
@@ -27,7 +27,6 @@ class ReportGeneratorTests(TestCase):
             self.assertTrue(content.count('HTTPError'), 2)
         os.remove(TEST_REPORT)
 
-    @requests_mock.mock()
     def test_stat_url_inaccessible(self, mocked_request):
         mocked_request.get(STAT_URL, status_code=500)
         generate_report(MOCKED_DISTRIBUTION, HTML_TEMPLATE, TEST_REPORT)

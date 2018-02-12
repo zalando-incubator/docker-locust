@@ -2,12 +2,12 @@ import csv
 import datetime
 import logging
 import os
-import requests
 
 from flask import make_response
 
 from jinja2 import Environment, FileSystemLoader
 
+import requests
 
 WORK_DIR = os.path.dirname(__file__)
 CSV_URL = 'http://0.0.0.0:8089/stats/distribution/csv'
@@ -87,7 +87,8 @@ def download_report():
     :return: load test report in html format.
 
     """
-    if os.getenv('ROLE') != 'master': return
+    if os.getenv('ROLE') != 'master':
+        return
 
     res = requests.get(url=CSV_URL)
     logger.info('request code for {url} is {status}'.format(url=CSV_URL, status=res.status_code))

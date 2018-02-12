@@ -75,14 +75,10 @@ ________________________________________________________________________________
 _________________________________________________________________________________
 EOF
     IMAGE_NAME=test_image_locust
-    CONTAINER_NAME=test_container_locust
 
     echo "Delete old reports"
     rm -f flake8.log
     rm -f coverage.xml xunit.xml
-
-    echo "Delete docker images"
-    docker stop ${CONTAINER_NAME} && docker rm ${CONTAINER_NAME}
 
     docker build -t ${IMAGE_NAME} .
 
@@ -90,9 +86,7 @@ EOF
     docker run --rm ${IMAGE_NAME} /bin/bash -c "flake8 ." > flake8.log
 
     echo "Start unit test"
-    docker run --name ${CONTAINER_NAME} ${IMAGE_NAME} nosetests -v
-    docker cp ${CONTAINER_NAME}:/opt/coverage.xml .
-    docker cp ${CONTAINER_NAME}:/opt/xunit.xml .
+    docker run --rm -v $PWD:/opt/result ${IMAGE_NAME} nosetests -v
 }
 
 function deploy() {
@@ -102,16 +96,8 @@ ________________________________________________________________________________
                          L O C A L - D E P L O Y M E N T
 _________________________________________________________________________________
 EOF
-    IMAGE="registry.opensource.zalan.do/tip/docker-locust"
-    echo "----------------------------------------------"       
-    echo "             Download compose file            "     
-    echo "----------------------------------------------"     
-    COMPOSE_FILE=docker-compose.yaml      
-    if [ ! -f $COMPOSE_FILE ]; then       
-        curl -o $COMPOSE_FILE https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/docker-compose.yaml        
-        echo -e "Download completed! \xE2\x9C\x94"        
-    else      
-        echo -e 'File is found, download is not needed! \xE2\x9C\x94'     
+    if [ -z $IMAGE ]; then
+        IMAGE="registry.opensource.zalan.do/tip/docker-locust"
     fi
 
     [ -z "$TARGET" ] && read -p "Target url: " TARGET
@@ -123,10 +109,17 @@ EOF
         [ -z "$USERS" ] && read -p "Number of users [total users that will be simulated]: " USERS
         [ -z "$HATCH_RATE" ] && read -p "Hatch rate [number of user will be added per second]: " HATCH_RATE
         [ -z "$DURATION" ] && read -p "Duration [in seconds]: " DURATION
-        AUTOMATIC=True
+        AUTOMATIC=true
     else
-        AUTOMATIC=False
+        AUTOMATIC=false
     fi
+
+    COMPOSE=false
+    if [[ "$DOCKER_COMPOSE" =~ ^(True|true|T|t|1)$ ]]; then
+        COMPOSE=true
+    fi
+
+    KPI="${SEND_ANONYMOUS_USAGE_INFO:-true}"
 
     echo "----------------------------------------------"
     echo "                   VARIABLES                  "
@@ -138,28 +131,52 @@ EOF
     echo "NUMBER OF USERS: $USERS"
     echo "HATCH_RATE: $HATCH_RATE"
     echo "DURATION [in seconds]: $DURATION"
+    echo "COMPOSE: $COMPOSE"
+    echo "SEND_ANONYMOUS_USAGE_INFO: $KPI"
     echo "----------------------------------------------"
 
-    echo "Kill old containers if available"
-    docker-compose kill
+    if $COMPOSE; then
+        echo "Run with docker-compose"
+        echo "----------------------------------------------"
+        echo "             Download compose file            "
+        echo "----------------------------------------------"
+        COMPOSE_FILE=docker-compose.yaml
+        if [ ! -f $COMPOSE_FILE ]; then
+            curl -o $COMPOSE_FILE https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/docker-compose.yaml
+            echo -e "Download completed! \xE2\x9C\x94"
+        else
+            echo -e 'File is found, download is not needed! \xE2\x9C\x94'
+        fi
 
-    echo "Remove old containers"
-    echo y | docker-compose rm
+        echo "Kill old containers if available"
+        docker-compose kill
 
-    echo "Remove old reports"
-    rm -rf reports
+        echo "Remove old containers"
+        echo y | docker-compose rm
 
-    echo "Deploy Locust application locally"
-    (export IMAGE=$IMAGE && export TARGET_HOST=$TARGET && export LOCUST_FILE=$LOCUST_FILE && export SLAVE_NUM=$SLAVES &&
-    export AUTOMATIC=$AUTOMATIC && export USERS=$USERS && export HATCH_RATE=$HATCH_RATE &&
-    export DURATION=$DURATION && docker-compose up -d)
+        echo "Remove old reports"
+        rm -rf reports
 
-    echo "Locust application is successfully deployed. you can access http://<docker-host-ip-address>:8089"
+        echo "Deploy Locust application locally"
+        (export IMAGE=$IMAGE && export TARGET_HOST=$TARGET && export LOCUST_FILE=$LOCUST_FILE && export SLAVE_NUM=$SLAVES &&
+        export AUTOMATIC=$AUTOMATIC && export USERS=$USERS && export HATCH_RATE=$HATCH_RATE &&
+        export DURATION=$DURATION && export OAUTH=$OAUTH && URL=$URL && export SEND_ANONYMOUS_USAGE_INFO=$KPI &&
+        export SCOPES=$SCOPES && export BUILD_URL=$BUILD_URL && docker-compose up -d)
 
-    if [[ "$MODE" =~ ^(automatic|Automatic|auto)$ ]]; then
-        sleep 8
-        sleep $DURATION
-        docker cp docker_locusts_controller:/opt/reports .
+        echo "Locust application is successfully deployed. you can access http://<docker-host-ip-address>:8089"
+
+        if $AUTOMATIC; then
+            sleep 8
+            sleep $DURATION
+            docker cp docker_locusts_controller:/opt/reports .
+        fi
+    else
+        echo "Run in standalone mode"
+        docker run -i --rm -v $PWD/reports:/opt/reports -v ~/.aws:/root/.aws -v $PWD/:/opt/script \
+        -v $PWD/credentials:/meta/credentials -p 8089:8089 -e ROLE=standalone -e TARGET_HOST=$TARGET \
+        -e LOCUST_FILE=$LOCUST_FILE -e SLAVE_MUL=$SLAVES -e AUTOMATIC=$AUTOMATIC -e USERS=$USERS \
+        -e HATCH_RATE=$HATCH_RATE -e DURATION=$DURATION -e OAUTH=$OAUTH -e URL=$URL -e SCOPES=$SCOPES \
+        -e SEND_ANONYMOUS_USAGE_INFO=$KPI -e BUILD_URL=$BUILD_URL $IMAGE
     fi
 }
 

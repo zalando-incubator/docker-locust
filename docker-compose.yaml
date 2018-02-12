@@ -12,6 +12,8 @@ services:
       - ROLE=master
       - TARGET_HOST=$TARGET_HOST
       - LOCUST_FILE=$LOCUST_FILE
+      - SEND_ANONYMOUS_USAGE_INFO=$SEND_ANONYMOUS_USAGE_INFO
+      - BUILD_URL=$BUILD_URL
   slave:
     image: $IMAGE
     depends_on:
@@ -20,12 +22,16 @@ services:
     volumes:
       - ~/.aws:/root/.aws
       - ./:/opt/script
+      - ./credentials:/meta/credentials
     environment:
       - ROLE=slave
       - MASTER_HOST=master
       - TARGET_HOST=$TARGET_HOST
       - LOCUST_FILE=$LOCUST_FILE
       - SLAVE_MUL=$SLAVE_NUM
+      - OAUTH=$OAUTH
+      - URL=$URL
+      - SCOPES=$SCOPES
   controller:
     image: $IMAGE
     container_name: docker_locusts_controller
@@ -36,7 +42,7 @@ services:
       - ROLE=controller
       - MASTER_HOST=master
       - AUTOMATIC=$AUTOMATIC
+      - TOTAL_SLAVES=$SLAVE_NUM
       - USERS=$USERS
       - HATCH_RATE=$HATCH_RATE
-      - SLAVE_MUL=$SLAVE_NUM
       - DURATION=$DURATION

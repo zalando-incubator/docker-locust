@@ -7,23 +7,38 @@ Docker-Locust
 
 The purpose of this project is to provide a ready and easy-to-use version of [locust.io] which also contains additional/useful features that are required.
 
+Architecture
+------------
+Docker-Locust consist of 3 different roles:
+
+- Master: Instance that will run Locust's web interface where you start and stop the load test and see live statistics.
+- Slave: Instance that will simulate users and attack the target url based on user parameters.
+- Controller: Instance that will be run for automatic mode and will download the HTML report at the end of load test.
+
+This architecture support following type of deployment:
+
+- single container (standalone mode): If user have only one single machine.
+- multiple containers (normal mode): If user have more than one machine and want to create bigger load. This type of deployment might be used in docker-swarm or kubernetes case. An example for deployment in different containers can be seen in [docker-compose].
+
 Key advantages
 --------------
 
-1. It allows users to upload load test scenario/script from different resources (any HTTP/HTTPS URL, S3 bucket, and local machine).
-2. It has the ability to be run in any CI tool e.g. Jenkins (It can start/stop load test automatically) and provides an HTML report at the end of a load test.
+1. It allows locust to read load test scenario/script from different resources (any HTTP/HTTPS URL, S3 bucket, and local machine).
+2. It has the ability to be run in any CI tool e.g. [Jenkins] (It can start/stop load test automatically) and provides an HTML report at the end of a load test.
 3. It is also possible to be deployed in AWS to create bigger load.
-4. Open source with more useful features coming.
 
 Requirements
 ------------
 1. [docker engine] version 1.9.1+
-2. [docker-compose] version 1.6.0+
+2. [docker-compose] version 1.6.0+ (optional)
 
 Getting Started
 ---------------
 
-Run the application with the command:
+### Single machine / Standalone mode
+---
+
+docker-locust will be run as **standalone** version by default. Standalone version is for users who has only 1 single machine.
 
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy
@@ -41,19 +56,24 @@ Run type [automatic/manual]: manual
 *All of it can be simplify in one line:*
 
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py 4 manual
+bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy --target=https://targeturl.com --locust-file=https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py --slaves=4 --mode=manual
 ```
 
-OR you can also use your own load test script that is stored in **AWS S3**. e.g:
+It is also possible to run with normal docker command:
 
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com s3://mybucket/mypath/myscript.py 4 manual
+docker run -i --rm -v $PWD/reports:/opt/reports -v ~/.aws:/root/.aws -v $PWD/:/opt/script -v $PWD/credentials:/meta/credentials -p 8089:8089 -e ROLE=standalone -e TARGET_HOST=https://targeturl.com -e LOCUST_FILE=https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py -e SLAVE_MUL=4 -e AUTOMATIC=False registry.opensource.zalan.do/tip/docker-locust
 ```
 
-OR load test script that is stored in **your local machine** in your current / work directory. e.g.:
+### Multiple machines
+---
+
+docker-locust can be run in multiple docker-containers. It is useful for users who has more than one machine to create bigger load. In this point we are using docker-compose, but it is also possible to run it in different ways, e.g. Cloudformation in AWS.
+
+Run the application with the command:
 
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com myfolder/myscript.py 4 manual
+DOCKER_COMPOSE=true bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy
 ```
 
 Read multiple files
@@ -61,7 +81,7 @@ Read multiple files
 docker-locust has the ability to read multiple files from s3 or any http/https, e.g. [1 file is the load test file / python file](https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple_post.py) and [1 other file is json file](https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/payloads.json) where payloads are stored. Sample command:
 
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple_post.py,https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/payloads.json 4 manual
+bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy --target=https://targeturl.com --locust-file=https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple_post.py,https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/payloads.json --slaves=4 --mode=manual
 ```
 
 Report Generation
@@ -98,7 +118,7 @@ docker-locust can be run automatically by using CI tool like jenkins.
 1. Put following command in "Execute shell" field:
 
 	```bash
-	(echo 100 && echo 5 && echo 30) | bash <(curl -s https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh) deploy https://targeturl.com https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py 4 automatic
+	curl -O https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/local.sh && DOCKER_COMPOSE=true bash local.sh deploy --target=https://targeturl.com --locust-file=https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py --slaves=4 --mode=automatic --users=100 --hatch-rate=5 --duration=30
 	```
 
 2. Install [html-publisher-plugin] in jenkins to display load test result. Example configuration in jenkins job:
@@ -121,7 +141,7 @@ A version number is combination between the locust version being supported and p
 Capacity of docker-locust in AWS
 --------------------------------
 
-All the data based on load testing against simple [hello-world] application.
+All the data based on load testing against simple [hello-world] application with the default max_wait and min_wait values (1000ms).
 
 |No.   |Group Type   |EC2   |vCPU   |RAM (GiB)   |Clock Speed (GHz)   |Enhanced Networking   |Max total RPS that can be created per 1 slave machine (rough number)   |Price per hour (EU - Frankfurt)   |RPS per cent   |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -180,6 +200,7 @@ Security
 See [Security]
 
 [locust.io]: <http://locust.io>
+[docker-compose]: <docker-compose.yaml>
 [Jenkins]: <https://jenkins.io>
 [docker engine]: <https://docs.docker.com/engine/installation/>
 [docker-compose]: <https://docs.docker.com/compose/install/>
@@ -194,5 +215,5 @@ See [Security]
 [AWS-EC2-pricing]: <https://aws.amazon.com/ec2/pricing/on-demand/?nc1=h_ls>
 [guidelines]: <CONTRIBUTING.md>
 [maintainers]: <MAINTAINERS>
-[License]: <LICENSE>
+[License]: <LICENSE.md>
 [Security]: <SECURITY.md>

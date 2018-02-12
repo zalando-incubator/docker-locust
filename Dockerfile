@@ -1,4 +1,4 @@
-FROM registry.opensource.zalan.do/stups/ubuntu:16.04.3-10
+FROM registry.opensource.zalan.do/stups/ubuntu
 
 #=======================
 # General Configuration
@@ -24,8 +24,11 @@ RUN pip install -r /tmp/requirements.txt
 #=====================
 COPY src /opt/src/
 COPY setup.cfg /opt/
+RUN mkdir /opt/result
+RUN ln -s /opt/src/app.py /usr/local/bin/locust-wrapper
 WORKDIR /opt
 ENV PYTHONPATH .
 ARG DL_IMAGE_VERSION=latest
-ENV DL_IMAGE_VERSION=$DL_IMAGE_VERSION
+ENV DL_IMAGE_VERSION=$DL_IMAGE_VERSION \
+    SEND_ANONYMOUS_USAGE_INFO=true
 CMD ["/usr/bin/python", "src/app.py"]
