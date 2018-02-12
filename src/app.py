@@ -186,9 +186,7 @@ def send_usage_statistics(target_host):
         image_version = os.getenv('DL_IMAGE_VERSION', 'unknown')
 
         host_in_array = target_host.split('.')
-        if target_host.endswith('zalan.do'):
-            contains_zalando = True
-        elif len(host_in_array) >= 2 and 'zalando' in host_in_array[len(host_in_array) - 2]:
+        if target_host.endswith('zalan.do') or 'zalando' in target_host or 'zalon' in target_host:
             contains_zalando = True
         else:
             contains_zalando = False
