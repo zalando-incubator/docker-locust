@@ -13,7 +13,7 @@ Docker-Locust's analytics record some shared information for every event:
 - The release version of machine, e.g. `Linux_version_4.4.16-boot2docker_(gcc_version_4.9.2_(Debian_4.9.2-10)_)_#1_SMP_Fri_Jul_29_00:13:24_UTC_2016` This does not allow us to track individual users but does enable us to accurately measure user counts vs. event counts (https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#cid)
 - Docker-Locust analytics hit type, e.g. `event` (https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#t)
 - User type, e.g. `external` (https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#ec)
-- Description will contains information about platform and target host. This information will be get only from our internal users or users who load test target host which contains word 'zalan.do' or 'zalando'. (https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#el)
+- Description will contains information about platform and target host. This information will be get only from our internal users or users who load test target host which contains words 'zalan.do', 'zalando' or 'zalon'. (https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#el)
 - Docker-Locust application name, e.g. `docker-locust` (https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#an)
 - Docker-Locust application version, e.g. `0.8.1-p1` (https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#av)
 
