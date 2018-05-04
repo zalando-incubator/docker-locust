@@ -24,7 +24,7 @@ RUN pip install -r /tmp/requirements.txt
 #=====================
 COPY src /opt/src/
 COPY setup.cfg /opt/
-RUN mkdir /opt/result
+RUN mkdir /opt/result /opt/reports
 RUN ln -s /opt/src/app.py /usr/local/bin/locust-wrapper
 WORKDIR /opt
 ENV PYTHONPATH .
