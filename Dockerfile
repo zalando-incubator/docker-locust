@@ -24,11 +24,11 @@ RUN pip install -r /tmp/requirements.txt
 #=====================
 COPY src /opt/src/
 COPY setup.cfg /opt/
-RUN mkdir /opt/result
+RUN mkdir /opt/result /opt/reports
 RUN ln -s /opt/src/app.py /usr/local/bin/locust-wrapper
 WORKDIR /opt
 ENV PYTHONPATH .
 ARG DL_IMAGE_VERSION=latest
 ENV DL_IMAGE_VERSION=$DL_IMAGE_VERSION \
     SEND_ANONYMOUS_USAGE_INFO=true
-CMD ["/usr/bin/python", "src/app.py"]
+CMD ["/usr/bin/python", "/usr/local/bin/locust-wrapper"]
