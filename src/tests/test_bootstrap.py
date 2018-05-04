@@ -73,7 +73,7 @@ class TestBootstrap(TestCase):
         os.environ['USERS'] = '100'
         os.environ['HATCH_RATE'] = '5'
         os.environ['DURATION'] = '10'
-        print (mocked_dir)
+
         MASTER_URL = 'http://127.0.0.1:8089'
         mocked_request.get(url=MASTER_URL, text='ok')
         mocked_request.get(url=MASTER_URL + '/stats/requests', json={'slave_count': 3})
