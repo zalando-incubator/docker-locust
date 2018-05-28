@@ -63,7 +63,7 @@ class TestBootstrap(TestCase):
 
     @mock.patch('time.sleep')
     @mock.patch('os.makedirs')
-    @mock.patch('__builtin__.open')
+    @mock.patch('builtins.open')
     @requests_mock.Mocker()
     def test_valid_controller_automatic(self, mocked_timeout, mocked_dir, mocked_open, mocked_request):
         os.environ['ROLE'] = 'controller'
@@ -93,7 +93,7 @@ class TestBootstrap(TestCase):
 
     @mock.patch('time.sleep')
     @mock.patch('os.makedirs')
-    @mock.patch('__builtin__.open')
+    @mock.patch('builtins.open')
     @requests_mock.Mocker()
     def test_slaves_not_fully_connected(self, mocked_timeout, mocked_dir, mocked_open, mocked_request):
         os.environ['ROLE'] = 'controller'
