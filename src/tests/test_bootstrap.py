@@ -5,7 +5,6 @@ from unittest import TestCase
 import mock
 
 import requests_mock
-import builtins
 
 from src.app import bootstrap
 
