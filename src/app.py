@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import logging
 
@@ -316,18 +316,18 @@ def get_files():
         return files
 
 
-def convert_str_to_bool(str):
+def convert_str_to_bool(string):
     """
     Convert string to boolean.
 
-    :param str: given string
-    :type str: str
+    :param string: given string
+    :type string: str
     :return: converted string
     :rtype: bool
     """
-    if isinstance(str, basestring):
-        return str.lower() in ('yes', 'true', 't', '1')
-    else:
+    try:
+        return string.lower() in ('yes', 'true', 't', '1')
+    except AttributeError:
         return False
 
 
