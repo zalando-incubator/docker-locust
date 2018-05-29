@@ -316,18 +316,18 @@ def get_files():
         return files
 
 
-def convert_str_to_bool(string):
+def convert_str_to_bool(str):
     """
     Convert string to boolean.
 
-    :param string: given string
-    :type string: str
+    :param str: given string
+    :type str: str
     :return: converted string
     :rtype: bool
     """
-    try:
-        return string.lower() in ('yes', 'true', 't', '1')
-    except AttributeError:
+    if isinstance(str, basestring):
+        return str.lower() in ('yes', 'true', 't', '1')
+    else:
         return False
 
 
