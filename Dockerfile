@@ -31,4 +31,4 @@ ENV PYTHONPATH .
 ARG DL_IMAGE_VERSION=latest
 ENV DL_IMAGE_VERSION=$DL_IMAGE_VERSION \
     SEND_ANONYMOUS_USAGE_INFO=true
-CMD ["/usr/bin/python", "src/app.py"]
+CMD ["locust-wrapper"]
