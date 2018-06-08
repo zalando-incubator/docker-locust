@@ -27,8 +27,8 @@ COPY setup.cfg /opt/
 RUN mkdir /opt/result /opt/reports
 RUN ln -s /opt/src/app.py /usr/local/bin/locust-wrapper
 WORKDIR /opt
-ENV PYTHONPATH .
+ENV PYTHONPATH /opt
 ARG DL_IMAGE_VERSION=latest
 ENV DL_IMAGE_VERSION=$DL_IMAGE_VERSION \
     SEND_ANONYMOUS_USAGE_INFO=true
-CMD ["/usr/bin/python", "src/app.py"]
+CMD ["locust-wrapper"]
