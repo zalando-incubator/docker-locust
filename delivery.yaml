@@ -21,9 +21,7 @@ pipeline:
     cmd: |
         echo "Deploy image locally and run simple scenario"
         ./local.sh deploy --target=https://google.com --locust-file=./example/simple.py --slaves=2 --mode=auto --users=2 --hatch-rate=1 --duration=5
-        # check if report html file exists
-        ls -l reports | grep reports.html || exit 1
-        # check if file size is larger than 0
+        # check if file exists and size is larger than 0
         [ -s reports/reports.html ] || exit 1
         # check if RPS value is greater than 0
         cat reports/reports.html | grep 'RPS:' | cut -c 17- | awk -F'</strong' {'print $1">0"'} | bc -l | grep 1 || exit 1
