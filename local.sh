@@ -162,7 +162,7 @@ EOF
         if $AUTOMATIC; then
             ABORT_ON_EXIT="--abort-on-container-exit"
         else
-            echo "Getting the Locust application ready on http://<docker-host-ip-address>:8089"
+            echo "Locust will be available on http://<docker-host-ip-address>:8089"
         fi
 
         (export IMAGE=$IMAGE && export TARGET_HOST=$TARGET && export LOCUST_FILE=$LOCUST_FILE && export SLAVE_NUM=$SLAVES &&
