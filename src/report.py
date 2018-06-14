@@ -95,7 +95,7 @@ def download_report():
 
     if res.ok:
         distribution_file = 'distribution.csv'
-        with open(distribution_file, 'wb') as dis_file:
+        with open(distribution_file, 'w') as dis_file:
             dis_file.write(res.text)
 
         generate_report(distribution_file, HTML_TEMPLATE, HTML_REPORT)
