@@ -161,17 +161,20 @@ EOF
         (export IMAGE=$IMAGE && export TARGET_HOST=$TARGET && export LOCUST_FILE=$LOCUST_FILE && export SLAVE_NUM=$SLAVES &&
         export AUTOMATIC=$AUTOMATIC && export USERS=$USERS && export HATCH_RATE=$HATCH_RATE &&
         export DURATION=$DURATION && export OAUTH=$OAUTH && URL=$URL && export SEND_ANONYMOUS_USAGE_INFO=$KPI &&
-        export SCOPES=$SCOPES && export BUILD_URL=$BUILD_URL && docker-compose up)
-
-        echo "Locust application is successfully deployed. you can access http://<docker-host-ip-address>:8089"
+        export SCOPES=$SCOPES && export BUILD_URL=$BUILD_URL && docker-compose up --abort-on-container-exit)
 
         if $AUTOMATIC; then
-            sleep 8
             sleep $DURATION
             docker cp docker_locusts_controller:/opt/reports .
+        else
+            echo "Locust application is successfully deployed. you can access http://<docker-host-ip-address>:8089"
         fi
+
     else
         echo "Run in standalone mode"
+
+        [[ ! -d "./reports" ]] && mkdir reports
+
         docker run -i --rm -v $PWD/reports:/opt/reports -v ~/.aws:/root/.aws -v $PWD/:/opt/script \
         -v $PWD/credentials:/meta/credentials -p 8089:8089 -e ROLE=standalone -e TARGET_HOST=$TARGET \
         -e LOCUST_FILE=$LOCUST_FILE -e SLAVE_MUL=$SLAVES -e AUTOMATIC=$AUTOMATIC -e USERS=$USERS \
