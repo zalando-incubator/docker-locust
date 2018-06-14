@@ -1,4 +1,8 @@
 version: "2017-09-20"
+notifications:
+  hipchat:
+    rooms:
+      - "DP - TIP"
 pipeline:
 - id: build
   type: script
@@ -21,10 +25,12 @@ pipeline:
     cmd: |
         echo "Deploy image locally and run simple scenario"
         ./local.sh deploy --target=https://google.com --locust-file=./example/simple.py --slaves=2 --mode=auto --users=2 --hatch-rate=1 --duration=5
-        # check if file exists and size is larger than 0
+        # check if json report exists and has non-zero size
+        [ -s reports/requests.json ] || exit 1
+        # check if html report exists and has non-zero size
         [ -s reports/reports.html ] || exit 1
         # check if RPS value is greater than 0
-        cat reports/reports.html | grep 'RPS:' | cut -c 17- | awk -F'</strong' {'print $1">0"'} | bc -l | grep 1 || exit 1
+        cat reports/reports.html | grep 'RPS:' | cut -c 17- | awk -F'</strong' '{print ($1>0)}' | grep 1 || exit 1
   - desc: Push docker image
     cmd: |
         echo "Push docker image"
