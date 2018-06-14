@@ -20,7 +20,7 @@ pipeline:
   - desc: Run smoke test
     cmd: |
         echo "Deploy image locally and run simple scenario"
-        ./local.sh deploy --target=https://google.com --locust-file=./example/simple.py --slaves=2 --mode=auto --users=2 --hatch-rate=1 --duration=10
+        ./local.sh deploy --target=https://google.com --locust-file=./example/simple.py --slaves=2 --mode=auto --users=2 --hatch-rate=1 --duration=5
         ls -l reports | grep reports.html || exit 1
         ls -l reports | grep reports.csv || exit 1
   - desc: Push docker image
