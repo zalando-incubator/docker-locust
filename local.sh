@@ -160,7 +160,7 @@ EOF
         echo "Deploy Locust application locally"
 
         if $AUTOMATIC; then
-            ABORT_ON_EXIT="--abort-on-container-exit"
+            ABORT_ON_EXIT=""
         else
             echo "Locust will be available on http://<docker-host-ip-address>:8089"
         fi
