@@ -19,9 +19,9 @@ services:
     depends_on:
       - master
     network_mode: "service:master"
+    volumes_from:
+      - master
     volumes:
-      - ~/.aws:/root/.aws
-      - $PWD:/opt/script
       - $PWD/credentials:/meta/credentials
     environment:
       - ROLE=slave
