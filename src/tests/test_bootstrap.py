@@ -1,6 +1,7 @@
 """Unit test for bootstrap."""
 import os
 from unittest import TestCase
+from nose.tools import *
 
 import mock
 
@@ -14,6 +15,7 @@ class TestBootstrap(TestCase):
 
     @mock.patch('subprocess.Popen')
     @mock.patch('src.app.send_usage_statistics')
+    @raises(RuntimeError)
     def test_valid_master(self, popen, mocked_send_usage):
         os.environ['ROLE'] = 'master'
         os.environ['TARGET_HOST'] = 'https://test.com'
@@ -25,6 +27,7 @@ class TestBootstrap(TestCase):
             self.assertTrue(mocked_send_usage.called)
 
     @mock.patch('subprocess.Popen')
+    @raises(RuntimeError)
     def test_valid_slave(self, mocked_popen):
         os.environ['ROLE'] = 'slave'
         os.environ['TARGET_HOST'] = 'https://test.com'
