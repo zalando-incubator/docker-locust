@@ -24,7 +24,7 @@ RUN pip3 install -r /tmp/requirements.txt
 #=====================
 COPY src /opt/src/
 COPY setup.cfg /opt/
-RUN mkdir /opt/result /opt/reports
+RUN mkdir /opt/result /opt/reports /opt/script
 RUN ln -s /opt/src/app.py /usr/local/bin/locust-wrapper
 WORKDIR /opt
 ENV PYTHONPATH /opt
