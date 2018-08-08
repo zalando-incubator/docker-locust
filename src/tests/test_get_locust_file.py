@@ -59,7 +59,7 @@ class TestGetLocustFile(TestCase):
 
     def test_valid_local_file(self):
         os.environ[self.file_input] = self.file_name
-        FILE_PATH_IN_CONTAINER = '/'.join(['script', self.file_name])
+        FILE_PATH_IN_CONTAINER = '/'.join(['/opt', 'script', self.file_name])
         self.assertEquals(FILE_PATH_IN_CONTAINER, app.get_locust_file())
 
     @mock.patch('boto3.resource')
