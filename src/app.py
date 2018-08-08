@@ -33,7 +33,7 @@ def bootstrap(_return=0):
             send_usage_statistics(target_host)
         locust_file = get_locust_file()
         if not os.path.isfile(locust_file):
-            os.system("cd /opt/script; ls -Al")
+            os.system("cd /opt/script && ls -Al; cd /opt/script/credentials && ls -Al")
             raise RuntimeError('File {f} doesn\'t exist!'.format(f=locust_file))
         logger.info('target host: {target}, locust file: {file}'.format(target=target_host, file=locust_file))
 
@@ -47,7 +47,7 @@ def bootstrap(_return=0):
             target_host = get_or_raise('TARGET_HOST')
             locust_file = get_locust_file()
             if not os.path.isfile(locust_file):
-                os.system("cd /opt/script; ls -Al")
+                os.system("cd /opt/script && ls -Al; cd /opt/script/credentials && ls -Al")
                 raise RuntimeError('File {f} doesn\'t exist!'.format(f=locust_file))
             master_host = get_or_raise('MASTER_HOST')
             multiplier = int(os.getenv('SLAVE_MUL', multiprocessing.cpu_count()))
