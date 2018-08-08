@@ -7,7 +7,9 @@ services:
       - 8089:8089
     volumes:
       - ~/.aws:/root/.aws
-      - $PWD:/opt/script
+      - type: bind
+        source: ./
+        target: /opt/script
     environment:
       - ROLE=master
       - TARGET_HOST=$TARGET_HOST
@@ -21,8 +23,12 @@ services:
     network_mode: "service:master"
     volumes:
       - ~/.aws:/root/.aws
-      - $PWD:/opt/script
-      - $PWD/credentials:/meta/credentials
+      - type: bind
+        source: ./
+        target: /opt/script
+      - type: bind
+        source: ./credentials
+        target: /meta/credentials
     environment:
       - ROLE=slave
       - MASTER_HOST=master
