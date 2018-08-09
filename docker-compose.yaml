@@ -6,7 +6,7 @@ services:
       - 5557-5558:5557-5558
       - 8089:8089
     volumes_from:
-      - /taupageapp
+      - container:taupageapp
     volumes:
       - ~/.aws:/root/.aws
       - $PWD:/opt/script
