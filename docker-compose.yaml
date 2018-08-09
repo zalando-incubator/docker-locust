@@ -5,6 +5,8 @@ services:
     ports:
       - 5557-5558:5557-5558
       - 8089:8089
+    volumes_from:
+      - taupageapp
     volumes:
       - ~/.aws:/root/.aws
       - $PWD:/opt/script
