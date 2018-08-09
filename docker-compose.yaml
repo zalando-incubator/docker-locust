@@ -9,7 +9,7 @@ services:
       - container:taupageapp
     volumes:
       - ~/.aws:/root/.aws
-      - ./:/opt/script
+      - $WORKSPACE:/opt/script
     environment:
       - ROLE=master
       - TARGET_HOST=$TARGET_HOST
@@ -25,8 +25,8 @@ services:
       - container:taupageapp
     volumes:
       - ~/.aws:/root/.aws
-      - ./:/opt/script
-      - ./credentials:/meta/credentials
+      - $WORKSPACE:/opt/script
+      - $WORKSPACE/credentials:/meta/credentials
     environment:
       - ROLE=slave
       - MASTER_HOST=master

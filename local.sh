@@ -100,6 +100,10 @@ EOF
         IMAGE="registry.opensource.zalan.do/tip/docker-locust"
     fi
 
+    if [ -z $WORKSPACE ]; then
+        WORKSPACE=$PWD
+    fi
+
     [ -z "$TARGET" ] && read -p "Target url: " TARGET
     [ -z "$LOCUST_FILE" ] && read -p "Where load test script is stored (e.g. https://raw.githubusercontent.com/zalando-incubator/docker-locust/master/example/simple.py): " LOCUST_FILE
     [ -z "$SLAVES" ] && read -p "Number of slave(s): " SLAVES
@@ -168,7 +172,8 @@ EOF
         (export IMAGE=$IMAGE && export TARGET_HOST=$TARGET && export LOCUST_FILE=$LOCUST_FILE && export SLAVE_NUM=$SLAVES &&
         export AUTOMATIC=$AUTOMATIC && export USERS=$USERS && export HATCH_RATE=$HATCH_RATE &&
         export DURATION=$DURATION && export OAUTH=$OAUTH && URL=$URL && export SEND_ANONYMOUS_USAGE_INFO=$KPI &&
-        export SCOPES=$SCOPES && export BUILD_URL=$BUILD_URL && docker-compose up --force-recreate $ABORT_ON_EXIT)
+        export SCOPES=$SCOPES && export BUILD_URL=$BUILD_URL && export WORKSPACE=$WORKSPACE &&
+        docker-compose up --force-recreate $ABORT_ON_EXIT)
 
         if $AUTOMATIC; then
             docker cp docker_locusts_controller:/opt/reports .
