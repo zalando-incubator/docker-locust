@@ -11,4 +11,3 @@ requests>=2.18.1
 requests_mock>=1.3.0
 stups-tokens>=0.7
 wget==3.2
-distutils
