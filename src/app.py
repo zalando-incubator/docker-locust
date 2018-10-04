@@ -10,11 +10,19 @@ import subprocess
 import sys
 
 import requests
+import locust
+
+from distutils.version import LooseVersion
 
 processes = []
 logging.basicConfig()
 logger = logging.getLogger('bootstrap')
 
+def get_slaves_number(res=None):
+    if LooseVersion("0.8") < LooseVersion(locust.__version__):
+        return len(res.json().get('slaves'))
+    else:
+        return res.json().get('slave_count')
 
 def bootstrap(_return=0):
     """
@@ -94,7 +102,7 @@ def bootstrap(_return=0):
                             logger.info('Checking if all slave(s) are connected.')
                             stats_url = '/'.join([master_url, 'stats/requests'])
                             res = requests.get(url=stats_url)
-                            connected_slaves = res.json().get('slave_count')
+                            connected_slaves = get_slaves_number(res)
 
                             if connected_slaves >= total_slaves:
                                 break

@@ -8,6 +8,9 @@ from flask import make_response
 from jinja2 import Environment, FileSystemLoader
 
 import requests
+import locust
+
+from distutils.version import LooseVersion
 
 WORK_DIR = os.path.dirname(__file__)
 CSV_URL = 'http://0.0.0.0:8089/stats/distribution/csv'
@@ -18,6 +21,12 @@ HTML_REPORT = 'report.html'
 
 logger = logging.getLogger('reporting')
 
+
+def get_slaves_number(res=None):
+    if LooseVersion("0.8") < LooseVersion(locust.__version__):
+        return len(res.json().get('slaves'))
+    else:
+        return res.json().get('slave_count')
 
 def generate_report(distribution_csv, template_file, report_file):
     """
