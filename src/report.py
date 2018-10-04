@@ -6,10 +6,8 @@ import os
 from flask import make_response
 
 from jinja2 import Environment, FileSystemLoader
-from distutils.version import LooseVersion
 
 import requests
-import locust
 
 
 WORK_DIR = os.path.dirname(__file__)
@@ -22,11 +20,22 @@ HTML_REPORT = 'report.html'
 logger = logging.getLogger('reporting')
 
 
-def get_slaves_number(res=None):
-    if LooseVersion("0.8") < LooseVersion(locust.__version__):
-        return len(res.json().get('slaves'))
-    else:
-        return res.json().get('slave_count')
+def get_slaves_count(res=None):
+    """
+    Parses response of GET /stats/requests for the number of slaves, depending on locust version.
+
+    :param res: raw response of stats/requests
+    :type res: plain text json
+    :return: int number of slaves.
+
+    """
+    if res is not None:
+        if res.json().get('slave_count'):
+            return res.json().get('slave_count')
+        elif res.json().get('slaves'):
+            return len(res.json().get('slaves'))
+    return res
+
 
 def generate_report(distribution_csv, template_file, report_file):
     """
@@ -79,7 +88,7 @@ def generate_report(distribution_csv, template_file, report_file):
 
                 rf.write(j2_env.get_template(template_file).render(
                     datetime=datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
-                    slaves=round(float(json_res.get('slave_count')), 1),
+                    slaves=round(float(get_slaves_count(res)), 1),
                     rps=round(float(json_res.get('total_rps')), 1),
                     fails=round(float(json_res.get('fail_ratio')), 1),
                     stat_methods=s_methods, stat_names=s_names, stat_num_requests=s_num_req,

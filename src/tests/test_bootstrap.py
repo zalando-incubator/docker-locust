@@ -83,12 +83,12 @@ class TestBootstrap(TestCase):
 
         self.assertFalse(mocked_timeout.called)
         self.assertFalse(mocked_request.called)
-        #self.assertFalse(mocked_dir.called)
+        # self.assertFalse(mocked_dir.called)
         self.assertFalse(mocked_open.called)
         bootstrap()
         self.assertTrue(mocked_timeout.called)
         self.assertTrue(mocked_request.called)
-        #self.assertTrue(mocked_dir.called)
+        # self.assertTrue(mocked_dir.called)
         self.assertTrue(mocked_open.called)
 
     @mock.patch('time.sleep')
@@ -115,12 +115,12 @@ class TestBootstrap(TestCase):
 
         self.assertFalse(mocked_timeout.called)
         self.assertFalse(mocked_request.called)
-        #self.assertFalse(mocked_dir.called)
+        # self.assertFalse(mocked_dir.called)
         self.assertFalse(mocked_open.called)
         bootstrap()
         self.assertTrue(mocked_timeout.called)
         self.assertTrue(mocked_request.called)
-        #self.assertTrue(mocked_dir.called)
+        # self.assertTrue(mocked_dir.called)
         self.assertTrue(mocked_open.called)
 
     def test_invalid_role(self):

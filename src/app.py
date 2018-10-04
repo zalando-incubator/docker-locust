@@ -10,19 +10,28 @@ import subprocess
 import sys
 
 import requests
-import locust
-
-from distutils.version import LooseVersion
 
 processes = []
 logging.basicConfig()
 logger = logging.getLogger('bootstrap')
 
-def get_slaves_number(res=None):
-    if LooseVersion("0.8") < LooseVersion(locust.__version__):
-        return len(res.json().get('slaves'))
-    else:
-        return res.json().get('slave_count')
+
+def get_slaves_count(res=None):
+    """
+    Parses response of GET /stats/requests for the number of slaves, depending on locust version.
+
+    :param res: raw response of stats/requests
+    :type res: plain text json
+    :return: int number of slaves.
+
+    """
+    if res is not None:
+        if res.json().get('slave_count'):
+            return res.json().get('slave_count')
+        elif res.json().get('slaves'):
+            return len(res.json().get('slaves'))
+    return res
+
 
 def bootstrap(_return=0):
     """
@@ -102,7 +111,7 @@ def bootstrap(_return=0):
                             logger.info('Checking if all slave(s) are connected.')
                             stats_url = '/'.join([master_url, 'stats/requests'])
                             res = requests.get(url=stats_url)
-                            connected_slaves = get_slaves_number(res)
+                            connected_slaves = get_slaves_count(res)
 
                             if connected_slaves >= total_slaves:
                                 break
@@ -193,7 +202,6 @@ def send_usage_statistics(target_host):
         cdp_target_repository = os.getenv('CDP_TARGET_REPOSITORY')
         image_version = os.getenv('DL_IMAGE_VERSION', 'unknown')
 
-        host_in_array = target_host.split('.')
         if target_host.endswith('zalan.do') or 'zalando' in target_host or 'zalon' in target_host:
             contains_zalando = True
         else:
@@ -289,7 +297,7 @@ def get_locust_file():
                     file_name = wget.download(file)
                 else:
                     wget.download(file)
-            except:
+            except RuntimeError:
                 logger.error('File cannot be downloaded! Please check given url!')
         # Share volume with local machine
         else:

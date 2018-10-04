@@ -77,13 +77,12 @@ EOF
     IMAGE_NAME=test_image_locust
 
     echo "Delete old reports"
-    rm -f flake8.log
     rm -f coverage.xml xunit.xml
 
     docker build -t ${IMAGE_NAME} .
 
     echo "Start coding style test (Pep8)"
-    docker run --rm ${IMAGE_NAME} /bin/bash -c "flake8 ." > flake8.log
+    docker run --rm ${IMAGE_NAME} flake8
 
     echo "Start unit test"
     docker run --rm -v $PWD:/opt/result ${IMAGE_NAME} nosetests -v
