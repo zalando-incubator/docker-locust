@@ -25,12 +25,34 @@ class TestBootstrap(TestCase):
             self.assertTrue(mocked_send_usage.called)
 
     @mock.patch('subprocess.Popen')
-    def test_valid_slave(self, mocked_popen):
+    def test_master_not_ready_in_time(self, popen):
+        os.environ['ROLE'] = 'slave'
+        os.environ['TARGET_HOST'] = 'https://test.com'
+        os.environ['MASTER_HOST'] = '127.0.0.1'
+        os.environ['SLAVE_MUL'] = '1'
+        os.environ['MASTER_CHECK_TIMEOUT'] = '0.3'
+        os.environ['MASTER_CHECK_INTERVAL'] = '0.1'
+
+        with mock.patch('src.app.get_locust_file') as file:
+            with self.assertRaises(RuntimeError) as e:
+                bootstrap()
+                self.assertFalse(file.called)
+                self.assertFalse(popen.called)
+            self.assertEqual('The Master did not start in time.', str(e.exception))
+
+
+    @mock.patch('subprocess.Popen')
+    @requests_mock.Mocker()
+    def test_valid_slave(self, mocked_popen, mocked_request):
         os.environ['ROLE'] = 'slave'
         os.environ['TARGET_HOST'] = 'https://test.com'
         os.environ['MASTER_HOST'] = '127.0.0.1'
         os.environ['SLAVE_MUL'] = '3'
+        os.environ['SLAVES_CHECK_TIMEOUT'] = '0.3'
+        os.environ['SLAVES_CHECK_INTERVAL'] = '0.1'
 
+        MASTER_URL = 'http://127.0.0.1:8089'
+        mocked_request.get(url=MASTER_URL, text='ok')
         with mock.patch('src.app.get_locust_file') as file:
             bootstrap()
             self.assertTrue(file.called)
@@ -81,14 +103,9 @@ class TestBootstrap(TestCase):
         for endpoint in ['stop', 'stats/requests/csv', 'stats/distribution/csv', 'htmlreport']:
             mocked_request.get(url='/'.join([MASTER_URL, endpoint]), text='ok')
 
-        self.assertFalse(mocked_timeout.called)
-        self.assertFalse(mocked_request.called)
-        #self.assertFalse(mocked_dir.called)
-        self.assertFalse(mocked_open.called)
         bootstrap()
         self.assertTrue(mocked_timeout.called)
         self.assertTrue(mocked_request.called)
-        #self.assertTrue(mocked_dir.called)
         self.assertTrue(mocked_open.called)
 
     @mock.patch('time.sleep')
@@ -113,15 +130,10 @@ class TestBootstrap(TestCase):
         for endpoint in ['stop', 'stats/requests/csv', 'stats/distribution/csv', 'htmlreport']:
             mocked_request.get(url='/'.join([MASTER_URL, endpoint]), text='ok')
 
-        self.assertFalse(mocked_timeout.called)
-        self.assertFalse(mocked_request.called)
-        #self.assertFalse(mocked_dir.called)
-        self.assertFalse(mocked_open.called)
-        bootstrap()
-        self.assertTrue(mocked_timeout.called)
-        self.assertTrue(mocked_request.called)
-        #self.assertTrue(mocked_dir.called)
-        self.assertTrue(mocked_open.called)
+        with self.assertRaises(RuntimeError):
+            bootstrap()
+            self.assertFalse(mocked_request.called)
+            self.assertFalse(mocked_open.called)
 
     def test_invalid_role(self):
         os.environ['ROLE'] = 'unknown'
