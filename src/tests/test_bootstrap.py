@@ -38,7 +38,7 @@ class TestBootstrap(TestCase):
                 bootstrap()
                 self.assertFalse(file.called)
                 self.assertFalse(popen.called)
-            self.assertEqual('The Master did not start in time.', str(e.exception))
+            self.assertEqual('The master did not start in time.', str(e.exception))
 
 
     @mock.patch('subprocess.Popen')
