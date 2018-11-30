@@ -18,7 +18,7 @@ Docker-Locust container can be started in 4 different roles:
 
 There are 2 supported run types:
 - Manual: when a user manually starts and stops a test via a Locust Master UI.
-- Automatic: when a test is started by the Controller and runs for a specified time interval. F
+- Automatic: when a test is started by the Controller and runs for a specified time interval.
 
 And there are 2 ways to deploy it:
 - Local deployment (using `standalone` mode or [docker-compose]): when a singe machine can generate enough traffic.
