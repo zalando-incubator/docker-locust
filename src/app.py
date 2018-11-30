@@ -107,7 +107,7 @@ def bootstrap(_return=0):
             else:
                 logger.error('Connected slaves:{con} < defined slaves:{dfn}'.format(
                     con=connected_slaves, dfn=total_slaves))
-                raise RuntimeError('The Slaves did not connect in time.')
+                raise RuntimeError('The slaves did not connect in time.')
 
             logger.info('All slaves are succesfully connected! '
                         'Start load test automatically for {duration} seconds.'.format(duration=duration))
@@ -143,7 +143,7 @@ def bootstrap(_return=0):
                     file.write(res.content)
                 logger.info('Reports have been successfully created.')
             else:
-                logger.error('Locust cannot be started. Please check logs!')
+                logger.error('Locust cannot be started. Please check the logs!')
 
         except ValueError as v_err:
             logger.error(v_err)
