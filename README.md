@@ -24,7 +24,7 @@ And there are 2 ways to deploy it:
 - Local deployment (using `standalone` mode or [docker-compose]): when a singe machine can generate enough traffic.
 - Distributed deployment: when multiple machines are required to generate a bigger load. This type of deployment might be used in AWS or Kubernetes.
 An example deployment with different container roles can be found in [docker-compose].
-Using Automatic mode together with Distributed deployment type requires `TOTAL_SLAVES` variable to be set on the `controller` side. 
+Using Automatic mode together with Distributed deployment requires the `TOTAL_SLAVES` variable to be set on the `controller` side. 
 
 Key advantages
 --------------
