@@ -5,11 +5,10 @@ from random import randint
 from locust import HttpLocust
 from locust import TaskSet
 from locust import task
+
+# For HTML reporting
 from locust.web import app
-
 from src import report
-
-# For reporting
 app.add_url_rule('/htmlreport', 'htmlreport', report.download_report)
 
 # Read json file

@@ -5,11 +5,11 @@ import logging
 import multiprocessing
 import os
 
+import requests
 import signal
 import subprocess
 import sys
-
-import requests
+import time
 
 processes = []
 logging.basicConfig()
@@ -50,6 +50,9 @@ def bootstrap(_return=0):
 
         logger.info('target host: {target}, locust file: {file}, master: {master}, multiplier: {multiplier}'.format(
             target=target_host, file=locust_file, master=master_host, multiplier=multiplier))
+
+        wait_for_master()
+
         for _ in range(multiplier):
             logger.info('Started Process')
             s = subprocess.Popen([
@@ -72,8 +75,8 @@ def bootstrap(_return=0):
                 os.getenv('SLAVE_MUL', multiprocessing.cpu_count()))
             # Default time duration to wait all slaves to be connected is 1 minutes / 60 seconds
             slaves_check_timeout = float(os.getenv('SLAVES_CHECK_TIMEOUT', 60))
-            # Default sleep time interval is 10 seconds
-            slaves_check_interval = float(os.getenv('SLAVES_CHECK_INTERVAL', 5))
+            # Default sleep time interval is 3 seconds
+            slaves_check_interval = float(os.getenv('SLAVES_CHECK_INTERVAL', 3))
             users = int(get_or_raise('USERS'))
             hatch_rate = int(get_or_raise('HATCH_RATE'))
             duration = int(get_or_raise('DURATION'))
@@ -81,72 +84,67 @@ def bootstrap(_return=0):
                 'master url: {url}, users: {users}, hatch_rate: {rate}, duration: {duration}'.format(
                     url=master_url, users=users, rate=hatch_rate, duration=duration))
 
-            for _ in range(0, 5):
-                import time
-                time.sleep(3)
+            wait_for_master()
 
-                res = requests.get(url=master_url)
-                if res.ok:
-                    timeout = time.time() + slaves_check_timeout
-                    connected_slaves = 0
-                    while time.time() < timeout:
-                        try:
-                            logger.info('Checking if all slave(s) are connected.')
-                            stats_url = '/'.join([master_url, 'stats/requests'])
-                            res = requests.get(url=stats_url)
-                            connected_slaves = res.json().get('slave_count')
+            timeout = time.time() + slaves_check_timeout
+            connected_slaves = 0
+            while time.time() < timeout:
+                try:
+                    logger.info('Checking if all slave(s) are connected.')
+                    stats_url = '/'.join([master_url, 'stats/requests'])
+                    res = requests.get(url=stats_url)
+                    connected_slaves = res.json().get('slave_count')
 
-                            if connected_slaves >= total_slaves:
-                                break
-                            else:
-                                logger.info('Currently connected slaves: {con}'.format(con=connected_slaves))
-                                time.sleep(slaves_check_interval)
-                        except ValueError as v_err:
-                            logger.error(v_err.message)
+                    if connected_slaves >= total_slaves:
+                        break
                     else:
-                        logger.warning('Connected slaves:{con} != defined slaves:{dfn}'.format(
-                            con=connected_slaves, dfn=total_slaves))
+                        logger.info('Currently connected slaves: {con}'.format(con=connected_slaves))
 
-                    logger.info('All slaves are succesfully connected! '
-                                'Start load test automatically for {duration} seconds.'.format(duration=duration))
-                    payload = {'locust_count': users, 'hatch_rate': hatch_rate}
-                    res = requests.post(url=master_url + '/swarm', data=payload)
+                except ValueError as v_err:
+                    logger.error(v_err.message)
 
-                    if res.ok:
-                        time.sleep(duration)
-                        requests.get(url=master_url + '/stop')
-                        logger.info('Load test is stopped.')
+                time.sleep(slaves_check_interval)
+            else:
+                logger.error('Connected slaves:{con} < defined slaves:{dfn}'.format(
+                    con=connected_slaves, dfn=total_slaves))
+                raise RuntimeError('The slaves did not connect in time.')
 
-                        time.sleep(4)
+            logger.info('All slaves are succesfully connected! '
+                        'Start load test automatically for {duration} seconds.'.format(duration=duration))
+            payload = {'locust_count': users, 'hatch_rate': hatch_rate}
+            res = requests.post(url=master_url + '/swarm', data=payload)
 
-                        logging.info('Creating report folder.')
-                        report_path = os.path.join(os.getcwd(), 'reports')
-                        if not os.path.exists(report_path):
-                            os.makedirs(report_path)
+            if res.ok:
+                time.sleep(duration)
+                requests.get(url=master_url + '/stop')
+                logger.info('Load test is stopped.')
 
-                        logger.info('Creating reports...')
-                        for _url in ['requests', 'distribution']:
-                            res = requests.get(url=master_url + '/stats/' + _url + '/csv')
-                            with open(os.path.join(report_path, _url + '.csv'), "wb") as file:
-                                file.write(res.content)
+                time.sleep(4)
 
-                            if _url == 'distribution':
-                                continue
-                            res = requests.get(url=master_url + '/stats/' + _url)
-                            with open(os.path.join(report_path, _url + '.json'), "wb") as file:
-                                file.write(res.content)
+                logging.info('Creating reports folder.')
+                report_path = os.path.join(os.getcwd(), 'reports')
+                if not os.path.exists(report_path):
+                    os.makedirs(report_path)
 
-                        res = requests.get(url=master_url + '/htmlreport')
-                        with open(os.path.join(report_path, 'reports.html'), "wb") as file:
-                            file.write(res.content)
-                        logger.info('Reports have been successfully created.')
-                    else:
-                        logger.error('Locust cannot be started. Please check logs!')
+                logger.info('Creating reports...')
+                for _url in ['requests', 'distribution']:
+                    res = requests.get(url=master_url + '/stats/' + _url + '/csv')
+                    with open(os.path.join(report_path, _url + '.csv'), "wb") as file:
+                        file.write(res.content)
 
-                    break
-                else:
-                    logger.error('Attempt: {attempt}. Locust master might not ready yet.'
-                                 'Status code: {status}'.format(attempt=_, status=res.status_code))
+                    if _url == 'distribution':
+                        continue
+                    res = requests.get(url=master_url + '/stats/' + _url)
+                    with open(os.path.join(report_path, _url + '.json'), "wb") as file:
+                        file.write(res.content)
+
+                res = requests.get(url=master_url + '/htmlreport')
+                with open(os.path.join(report_path, 'reports.html'), "wb") as file:
+                    file.write(res.content)
+                logger.info('Reports have been successfully created.')
+            else:
+                logger.error('Locust cannot be started. Please check the logs!')
+
         except ValueError as v_err:
             logger.error(v_err)
 
@@ -164,7 +162,7 @@ def bootstrap(_return=0):
             sys.exit(0)
 
     else:
-        raise RuntimeError('Invalid ROLE value. Valid Options: master, slave, controller.')
+        raise RuntimeError('Invalid ROLE value. Valid Options: master, slave, controller, standalone.')
 
     if _return:
         return
@@ -350,6 +348,31 @@ def kill(signal, frame):
     logger.info('Received KILL signal')
     for s in processes:
         s.kill(s)
+
+
+def wait_for_master():
+    master_host = get_or_raise('MASTER_HOST')
+    master_url = 'http://{master}:8089'.format(master=master_host)
+
+    # Wait for the master to come online during SLAVES_CHECK_TIMEOUT
+    master_check_timeout = float(os.getenv('MASTER_CHECK_TIMEOUT', 60))
+    # Default sleep time interval is 3 seconds
+    master_check_interval = float(os.getenv('MASTER_CHECK_INTERVAL', 3))
+
+    timeout = time.time() + master_check_timeout
+    cnt = 1
+    while time.time() < timeout:
+        try:
+            res = requests.get(url=master_url, timeout=1)
+            if res.ok:
+                logger.info('Locust master is ready.')
+                return
+        except requests.exceptions.ConnectionError:
+            pass
+        logger.warning('Attempt: {attempt}. Locust master is not ready yet.'.format(attempt=cnt))
+        cnt += 1
+        time.sleep(master_check_interval)
+    raise RuntimeError('The master did not start in time.')
 
 
 if __name__ == '__main__':

@@ -9,16 +9,22 @@ The purpose of this project is to provide a ready and easy-to-use version of [lo
 
 Architecture
 ------------
-Docker-Locust consist of 3 different roles:
+Docker-Locust container can be started in 4 different roles:
 
-- Master: Instance that will run Locust's web interface where you start and stop the load test and see live statistics.
-- Slave: Instance that will simulate users and attack the target url based on user parameters.
-- Controller: Instance that will be run for automatic mode and will download the HTML report at the end of load test.
+- `master`: Runs Locust's web interface where you start and stop the load test and see live statistics.
+- `slave`: Simulates users and attacks the target url based on user parameters.
+- `controller`: Orchestrates Master in automatic mode and downloads reports when the test is over.
+- `standalone`: Automatically starts the above components locally.
 
-This architecture support following type of deployment:
+There are 2 supported run types:
+- Manual: when a user manually starts and stops a test via a Locust Master UI.
+- Automatic: when a test is started by the Controller and runs for a specified time interval.
 
-- single container (standalone mode): If user have only one single machine.
-- multiple containers (normal mode): If user have more than one machine and want to create bigger load. This type of deployment might be used in docker-swarm or kubernetes case. An example for deployment in different containers can be seen in [docker-compose].
+And there are 2 ways to deploy it:
+- Local deployment (using `standalone` mode or [docker-compose]): when a singe machine can generate enough traffic.
+- Distributed deployment: when multiple machines are required to generate a bigger load. This type of deployment might be used in AWS or Kubernetes.
+An example deployment with different container roles can be found in [docker-compose].
+Using Automatic mode together with Distributed deployment requires the `TOTAL_SLAVES` variable to be set on the `controller` side. 
 
 Key advantages
 --------------
