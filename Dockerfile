@@ -1,4 +1,4 @@
-FROM registry.opensource.zalan.do/stups/ubuntu:18.04-15
+FROM registry.opensource.zalan.do/library/ubuntu-18.04:latest
 
 #=======================
 # General Configuration
